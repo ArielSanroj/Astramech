@@ -1,0 +1,16 @@
+{
+  "company": "TechCorp Ltd",
+  "period": "2024",
+  "currency": "USD",
+  "financial_data": {
+    "revenue": 10000000,
+    "cost_of_sales": 4000000,
+    "gross_profit": 6000000,
+    "operating_expenses": 2500000,
+    "operating_profit": 3500000,
+    "net_income": 2800000,
+    "total_assets": 20000000,
+    "total_liabilities": 8000000,
+    "total_equity": 12000000
+  }
+}

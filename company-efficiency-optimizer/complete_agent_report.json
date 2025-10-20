@@ -1,0 +1,104 @@
+{
+  "company_profile": {
+    "company_name": "CARMANFE SAS",
+    "industry": "services",
+    "employee_count": 15,
+    "company_age_years": 5,
+    "file_format": "excel",
+    "is_annual_financial_data": true,
+    "additional_notes": "Empresa de servicios profesionales en Colombia, especializada en consultoría"
+  },
+  "financial_data": {
+    "company": "Unknown Company",
+    "currency": "USD",
+    "period": "Unknown",
+    "sheets_processed": [
+      "BALANCE DE PRUEBA ENERO (Balance Sheet)",
+      "INFORME ESFA ENE-MAY (P&L)",
+      "BALANCE DE PRUEBA FEBRERO (Balance Sheet)",
+      "BALANCE DE PRUEBA MARZO (Balance Sheet)",
+      "BALANCE DE PRUEBA X TERC (Balance Sheet)",
+      "BALANCE DE PRUEBA ABRIL 2025 (Balance Sheet)",
+      "BALANCE DE PRUEBA MAYO (Balance Sheet)",
+      "ESTADO DE RESULTADOS (P&L)"
+    ],
+    "total_assets": 9998415695.16,
+    "cash_and_equivalents": 16171911.57,
+    "total_liabilities": 757946280.63,
+    "total_equity": 9255547713.32,
+    "revenue": 20000000.0,
+    "operating_expenses": 16436928.43,
+    "operating_income": 3563071.5700000003,
+    "net_income": 3033656.5600000005,
+    "industry": "services",
+    "employee_count": 66,
+    "metadata": {
+      "file_format": "excel",
+      "language": "es",
+      "accounting_standard": "IFRS",
+      "normalization_timestamp": "2025-10-18T05:25:42.317585"
+    }
+  },
+  "kpi_analysis": [
+    {
+      "name": "Operating Margin",
+      "value": 17.81535785,
+      "benchmark": 15.0,
+      "performance_ratio": 1.1876905233333335,
+      "status": "GOOD",
+      "description": "Operating profit margin: 17.8% vs 15.0% benchmark"
+    },
+    {
+      "name": "Net Margin",
+      "value": 15.168282800000002,
+      "benchmark": 10.0,
+      "performance_ratio": 1.5168282800000001,
+      "status": "EXCELLENT",
+      "description": "Net profit margin: 15.2% vs 10.0% benchmark"
+    },
+    {
+      "name": "Revenue per Employee",
+      "value": 303030.30303030304,
+      "benchmark": 300000,
+      "performance_ratio": 1.0101010101010102,
+      "status": "GOOD",
+      "description": "Revenue per employee: $303,030 vs $300,000 benchmark"
+    },
+    {
+      "name": "Asset Turnover",
+      "value": 0.002000316911176391,
+      "benchmark": 1.5,
+      "performance_ratio": 0.0013335446074509273,
+      "status": "CRITICAL",
+      "description": "Asset turnover: 0.00 vs 1.50 benchmark"
+    },
+    {
+      "name": "Debt to Equity Ratio",
+      "value": 0.08189102407621016,
+      "benchmark": 0.4,
+      "performance_ratio": 0.20472756019052538,
+      "status": "CRITICAL",
+      "description": "Debt to equity ratio: 0.08 vs 0.40 benchmark"
+    },
+    {
+      "name": "Return on Assets (ROA)",
+      "value": 0.030341372598345986,
+      "benchmark": 8.0,
+      "performance_ratio": 0.0037926715747932482,
+      "status": "CRITICAL",
+      "description": "Return on assets: 0.0% vs 8.0% benchmark"
+    },
+    {
+      "name": "Return on Equity (ROE)",
+      "value": 0.03277662926024522,
+      "benchmark": 15.0,
+      "performance_ratio": 0.0021851086173496816,
+      "status": "CRITICAL",
+      "description": "Return on equity: 0.0% vs 15.0% benchmark"
+    }
+  ],
+  "agent_recommendations": [],
+  "agent_execution_results": {},
+  "agent_report": "# 🤖 Reporte de Recomendaciones de Agentes IA\n\n## 📊 Resumen Ejecutivo\n\nSe identificaron 0 áreas de mejora que requieren atención especializada.\nSe ejecutaron 0 agentes especializados.\n\n## 🎯 Recomendaciones Prioritarias\n\n## 🔧 Resultados de Ejecución de Agentes\n\n## 🚀 Próximos Pasos Recomendados\n\n1. **Revisar resultados** de los agentes ejecutados\n2. **Priorizar implementación** basada en impacto y esfuerzo\n3. **Asignar recursos** para las mejoras identificadas\n4. **Establecer métricas** de seguimiento\n5. **Programar revisiones** periódicas del progreso\n\n",
+  "file_processed": "/Users/arielsanroj/Downloads/testastra.xlsx"
+}

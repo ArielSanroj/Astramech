@@ -1,0 +1,11 @@
+employeeNumber,firstName,lastName,hireDate,terminationDate,department,jobTitle
+1,John,Smith,2023-01-15,,Sales,Sales Rep
+2,Jane,Doe,2023-03-20,2024-01-15,Marketing,Marketing Manager
+3,Mike,Johnson,2022-11-10,,Engineering,Software Engineer
+4,Sarah,Wilson,2023-06-05,,HR,HR Specialist
+5,David,Brown,2022-08-30,2023-12-20,Finance,Accountant
+6,Lisa,Davis,2023-02-14,,Sales,Sales Manager
+7,Tom,Miller,2022-12-01,,Engineering,Senior Engineer
+8,Amy,Garcia,2023-04-18,,Marketing,Marketing Coordinator
+9,Chris,Martinez,2023-01-08,,Engineering,DevOps Engineer
+10,Emma,Anderson,2022-09-25,2024-02-10,Sales,Sales Rep

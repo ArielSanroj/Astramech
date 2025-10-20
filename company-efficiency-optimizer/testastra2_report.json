@@ -1,0 +1,44 @@
+{
+  "company": "APRU SAS",
+  "industry": "services",
+  "metadata": {
+    "file_format": "excel",
+    "language": "es",
+    "accounting_standard": "IFRS",
+    "normalization_timestamp": "2025-10-18T04:37:37.473336"
+  },
+  "financial_data": {
+    "revenue": 496910820.0,
+    "net_income": 0,
+    "total_assets": 0,
+    "employee_count": 1656
+  },
+  "kpis": [
+    {
+      "name": "Operating Margin",
+      "value": 38.99092806834031,
+      "benchmark": 15.0,
+      "status": "excellent",
+      "description": "Operating profit margin: 39.0% vs 15.0% benchmark"
+    },
+    {
+      "name": "Revenue per Employee",
+      "value": 300066.9202898551,
+      "benchmark": 300000,
+      "status": "good",
+      "description": "Revenue per employee: $300,067 vs $300,000 benchmark"
+    }
+  ],
+  "inefficiencies": [],
+  "sheets_processed": [
+    "Datos_Generales (Balance Sheet)",
+    "ESF (Balance Sheet)",
+    "ER (P&L)",
+    "Notas (P&L)",
+    "FLUJO_EFECTIVO (P&L)",
+    "PATRIMONIO (Balance Sheet)",
+    "Terceros (P&L)",
+    "balance prueba act (Balance Sheet)",
+    "balance prueba ante (Balance Sheet)"
+  ]
+}

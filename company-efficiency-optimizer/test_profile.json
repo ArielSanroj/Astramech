@@ -1,0 +1,9 @@
+{
+  "company_name": "Empresa de Prueba SAS",
+  "industry": "services",
+  "employee_count": 50,
+  "company_age_years": 5,
+  "file_format": "excel",
+  "is_annual_financial_data": true,
+  "additional_notes": "Empresa de consultoría en tecnología"
+}

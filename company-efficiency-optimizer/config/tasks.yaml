@@ -1,0 +1,165 @@
+request_pnl_task:
+  description: |
+    Prompt the user to upload or provide P&L data if not available. Once received, extract and clean the data.
+    This includes:
+    - Requesting P&L statement (PDF, CSV, or text format)
+    - Extracting key financial figures (Revenue, COGS, Operating Expenses, etc.)
+    - Validating data completeness and accuracy
+    - Converting to standardized JSON format for analysis
+  expected_output: |
+    Cleaned P&L dataset in JSON format with standardized fields:
+    {
+      "revenue": 1000000,
+      "cogs": 700000,
+      "gross_profit": 300000,
+      "operating_expenses": 200000,
+      "operating_income": 100000,
+      "net_income": 80000,
+      "period": "Q3_2024",
+      "employee_count": 50
+    }
+  agent: diagnostic_agent
+  tools: ["human"]
+
+kpi_computation_task:
+  description: |
+    Compute key performance indicators (KPIs) and analyze them for inefficiencies:
+    
+    1. Financial KPIs:
+       - Gross Margin = (Gross Profit / Revenue) × 100
+       - Operating Margin = (Operating Income / Revenue) × 100
+       - Net Margin = (Net Income / Revenue) × 100
+       - Revenue per Employee = Revenue / Employee Count
+    
+    2. Operational KPIs:
+       - Turnover Rate = (Exits / Average Headcount) × 100
+       - Productivity Index = Revenue per Employee / Industry Benchmark
+       - Cost Efficiency = Operating Expenses / Revenue
+    
+    3. Analysis:
+       - Compare against industry benchmarks (e.g., 30% gross margin for retail)
+       - Identify trends and anomalies
+       - Flag inefficiencies and their potential causes
+       - Recommend specialized agents for targeted optimization
+  expected_output: |
+    Comprehensive KPI analysis table with:
+    - Calculated KPIs with industry benchmarks
+    - Identified inefficiencies with severity ratings
+    - Root cause analysis for each issue
+    - Recommended specialized agents for resolution
+    - Priority ranking for optimization efforts
+    
+    Example output:
+    | KPI | Current Value | Benchmark | Status | Recommendation |
+    |-----|---------------|-----------|--------|----------------|
+    | Gross Margin | 25% | 30% | ⚠️ Below Target | Operations Optimizer |
+    | Turnover Rate | 35% | 15% | 🚨 Critical | HR Optimizer |
+    | Revenue/Employee | $20K | $25K | ⚠️ Below Target | Financial Optimizer |
+
+diagnostic_summary_task:
+  description: |
+    Create a comprehensive diagnostic summary that:
+    1. Synthesizes all KPI findings into a clear executive summary
+    2. Identifies the top 3-5 critical issues requiring immediate attention
+    3. Provides a strategic roadmap for optimization
+    4. Estimates potential impact of addressing each issue
+    5. Recommends implementation timeline and resource allocation
+  expected_output: |
+    Executive diagnostic report including:
+    - Executive Summary (2-3 paragraphs)
+    - Critical Issues Dashboard (top 5 issues with impact scores)
+    - Strategic Recommendations (prioritized action plan)
+    - Implementation Roadmap (timeline and resource requirements)
+    - Expected Outcomes (quantified benefits and ROI projections)
+  agent: diagnostic_agent
+
+dynamic_agent_creation_task:
+  description: |
+    Analyze P&L data, calculate KPIs, identify inefficiencies, and dynamically create specialized AI agents tailored to address specific business issues:
+    
+    1. Enhanced KPI Analysis:
+       - Calculate comprehensive financial, operational, and HR KPIs
+       - Compare against 2025 industry benchmarks
+       - Identify inefficiencies with severity classification
+       - Detect business patterns and root causes
+    
+    2. Dynamic Agent Generation:
+       - Use NVIDIA LLM to generate specialized agent profiles
+       - Create detailed backstories, goals, and capabilities
+       - Tailor agents to specific inefficiencies and business needs
+       - Generate success metrics and implementation strategies
+    
+    3. Agent Configuration:
+       - Save agent configurations to dynamic_agents.yaml
+       - Create comprehensive diagnostic report
+       - Store analysis in memory system for future reference
+       - Provide implementation roadmap for agent deployment
+  expected_output: |
+    Complete dynamic agent generation including:
+    - Enhanced KPI analysis with industry benchmarks
+    - Identified inefficiencies with severity and root causes
+    - Dynamically generated AI agent configurations
+    - Comprehensive diagnostic report with implementation roadmap
+    - Agent configurations saved to dynamic_agents.yaml
+    - Analysis stored in memory system
+    
+    Example output structure:
+    {
+      "kpis": {...},
+      "inefficiencies": [...],
+      "recommended_agents": [...],
+      "agent_configs": {...},
+      "diagnostic_report": "markdown_report_content"
+    }
+  agent: diagnostic_agent
+
+hr_analysis_task:
+  description: |
+    Deep dive analysis of HR-related inefficiencies identified by the diagnostic agent:
+    1. Analyze turnover patterns and root causes
+    2. Assess recruitment and retention strategies
+    3. Evaluate employee satisfaction and engagement metrics
+    4. Identify talent gaps and skill shortages
+    5. Develop targeted HR optimization strategies
+  expected_output: |
+    HR optimization strategy including:
+    - Turnover analysis with root cause identification
+    - Recruitment and retention recommendations
+    - Employee engagement improvement plan
+    - Talent development strategy
+    - Implementation timeline and success metrics
+  agent: hr_optimizer
+
+operations_analysis_task:
+  description: |
+    Deep dive analysis of operational inefficiencies:
+    1. Process mapping and bottleneck identification
+    2. Resource utilization analysis
+    3. Quality and efficiency metrics assessment
+    4. Technology and automation opportunities
+    5. Supply chain and logistics optimization
+  expected_output: |
+    Operations optimization strategy including:
+    - Process improvement recommendations
+    - Resource optimization plan
+    - Technology implementation roadmap
+    - Quality enhancement strategies
+    - Performance metrics and monitoring plan
+  agent: operations_optimizer
+
+financial_analysis_task:
+  description: |
+    Deep dive analysis of financial performance optimization:
+    1. Cost structure analysis and reduction opportunities
+    2. Revenue optimization strategies
+    3. Cash flow and working capital management
+    4. Pricing strategy optimization
+    5. Investment and ROI analysis
+  expected_output: |
+    Financial optimization strategy including:
+    - Cost reduction action plan
+    - Revenue enhancement strategies
+    - Cash flow optimization recommendations
+    - Pricing strategy improvements
+    - Investment prioritization framework
+  agent: financial_optimizer
