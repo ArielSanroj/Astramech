@@ -1,0 +1,117 @@
+textagents:
+  diagnostic_agent:
+    name: Diagnostic Agent
+    model: ${NANOBOT_DIAGNOSTIC_MODEL:-gpt-4}
+    mcpServers:
+    - kpi_mcp
+    - hr_analysis_mcp
+  hr_optimizer:
+    name: HR Optimizer
+    model: ${NANOBOT_HR_MODEL:-claude-3}
+    mcpServers:
+    - hr_analysis_mcp
+  operations_optimizer:
+    name: Operations Optimizer
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Streamline operations and reduce operating expenses
+      priority: high
+      focus_areas:
+      - Operating Margin
+  financial_optimizer:
+    name: Financial Optimizer
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Improve overall profitability through cost reduction and revenue growth
+      priority: high
+      focus_areas:
+      - Net Margin
+  supply_chain_optimizer:
+    name: Supply Chain Optimizer
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Optimize cost of goods sold through supplier negotiations and process
+        improvements
+      priority: high
+      focus_areas:
+      - COGS Ratio
+  sales_growth_agent:
+    name: Sales Growth Agent
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Increase revenue through market expansion and sales optimization
+      priority: high
+      focus_areas:
+      - Revenue Growth Rate
+  productivity_optimizer:
+    name: Productivity Optimizer
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Enhance workforce productivity and efficiency
+      priority: high
+      focus_areas:
+      - Revenue per Employee
+  process_optimization_agent:
+    name: Process Optimization Agent
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Improve operational efficiency and resource utilization
+      priority: high
+      focus_areas:
+      - Operating Efficiency
+  hr_retention_specialist:
+    name: HR Retention Specialist
+    model: gpt-4o
+    mcpServers:
+    - hr_analysis_mcp
+    metadata:
+      goal: Reduce turnover and improve employee retention through engagement programs
+      priority: high
+      focus_areas:
+      - Revenue per Employee
+      - Expense Ratio
+  cash_flow_manager:
+    name: Cash Flow Manager
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Improve cash flow through expense reduction and revenue acceleration
+      priority: critical
+      focus_areas:
+      - Operating Margin
+      - Expense Ratio
+  growth_strategy_agent:
+    name: Growth Strategy Agent
+    model: gpt-4o
+    mcpServers:
+    - kpi_mcp
+    metadata:
+      goal: Develop and execute growth strategies to increase revenue and market share
+      priority: high
+      focus_areas:
+      - Revenue Growth Rate
+      - Operating Margin
+mcpServers:
+  kpi_mcp:
+    url: ${KPI_MCP_URL:-http://127.0.0.1:5000}
+    description: KPI analysis server exposing KPI calculator endpoints
+  hr_analysis_mcp:
+    url: ${HR_MCP_URL:-http://127.0.0.1:5001}
+    description: HR analytics server providing turnover diagnostics
+settings:
+  telemetry: false
+  cache: true
+  locale: ${NANOBOT_LOCALE:-en-US}

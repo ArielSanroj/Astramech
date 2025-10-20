@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Efficiency Optimizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .metric-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .kpi-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .kpi-header {
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .recommendation-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+        .status-good {
+            color: #28a745;
+        }
+        .status-warning {
+            color: #ffc107;
+        }
+        .status-danger {
+            color: #dc3545;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-chart-line me-2"></i>
+                Company Efficiency Optimizer
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">Analysis Results</h1>
+                <p class="lead text-muted">Comprehensive efficiency analysis for {{ results.company_name }}</p>
+            </div>
+        </div>
+
+        {% if results.error %}
+        <!-- Error State -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Analysis Error</h4>
+                    <p>{{ results.error }}</p>
+                    <hr>
+                    <p class="mb-0">Please try again or contact support if the issue persists.</p>
+                </div>
+                <div class="text-center">
+                    <a href="{{ url_for('questionnaire') }}" class="btn btn-primary">
+                        <i class="fas fa-redo me-2"></i>Start New Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Success State -->
+        
+        <!-- Key Metrics Overview -->
+        <div class="row mb-5">
+            <div class="col-md-3 mb-3">
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(results.kpi_results.financial.gross_margin * 100) }}%</div>
+                    <div class="metric-label">Gross Margin</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(results.kpi_results.financial.operating_margin * 100) }}%</div>
+                    <div class="metric-label">Operating Margin</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="metric-card">
+                    <div class="metric-value">${{ "{:,.0f}".format(results.kpi_results.financial.revenue_per_employee) }}</div>
+                    <div class="metric-label">Revenue per Employee</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(results.kpi_results.operational.productivity_index * 100) }}%</div>
+                    <div class="metric-label">Productivity Index</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Analysis -->
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Financial KPIs -->
+                <div class="card kpi-card">
+                    <div class="kpi-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Financial Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Gross Margin</span>
+                                    <span class="fw-bold {{ 'status-good' if results.kpi_results.financial.gross_margin > 0.3 else 'status-warning' if results.kpi_results.financial.gross_margin > 0.2 else 'status-danger' }}">
+                                        {{ "%.1f"|format(results.kpi_results.financial.gross_margin * 100) }}%
+                                    </span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: {{ results.kpi_results.financial.gross_margin * 100 }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Operating Margin</span>
+                                    <span class="fw-bold {{ 'status-good' if results.kpi_results.financial.operating_margin > 0.15 else 'status-warning' if results.kpi_results.financial.operating_margin > 0.1 else 'status-danger' }}">
+                                        {{ "%.1f"|format(results.kpi_results.financial.operating_margin * 100) }}%
+                                    </span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: {{ results.kpi_results.financial.operating_margin * 100 }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Net Margin</span>
+                                    <span class="fw-bold {{ 'status-good' if results.kpi_results.financial.net_margin > 0.1 else 'status-warning' if results.kpi_results.financial.net_margin > 0.05 else 'status-danger' }}">
+                                        {{ "%.1f"|format(results.kpi_results.financial.net_margin * 100) }}%
+                                    </span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: {{ results.kpi_results.financial.net_margin * 100 }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Revenue per Employee</span>
+                                    <span class="fw-bold">${{ "{:,.0f}".format(results.kpi_results.financial.revenue_per_employee) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HR KPIs -->
+                <div class="card kpi-card">
+                    <div class="kpi-header">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>Human Resources</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Turnover Rate</span>
+                                    <span class="fw-bold {{ 'status-good' if results.kpi_results.hr.turnover_rate < 0.1 else 'status-warning' if results.kpi_results.hr.turnover_rate < 0.2 else 'status-danger' }}">
+                                        {{ "%.1f"|format(results.kpi_results.hr.turnover_rate * 100) }}%
+                                    </span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-warning" style="width: {{ results.kpi_results.hr.turnover_rate * 100 }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Total Employees</span>
+                                    <span class="fw-bold">{{ results.kpi_results.hr.total_employees }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operational KPIs -->
+                <div class="card kpi-card">
+                    <div class="kpi-header">
+                        <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Operational Efficiency</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Cost Efficiency Ratio</span>
+                                    <span class="fw-bold {{ 'status-good' if results.kpi_results.operational.cost_efficiency_ratio > 0.8 else 'status-warning' if results.kpi_results.operational.cost_efficiency_ratio > 0.6 else 'status-danger' }}">
+                                        {{ "%.1f"|format(results.kpi_results.operational.cost_efficiency_ratio * 100) }}%
+                                    </span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: {{ results.kpi_results.operational.cost_efficiency_ratio * 100 }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Productivity Index</span>
+                                    <span class="fw-bold {{ 'status-good' if results.kpi_results.operational.productivity_index > 0.8 else 'status-warning' if results.kpi_results.operational.productivity_index > 0.6 else 'status-danger' }}">
+                                        {{ "%.1f"|format(results.kpi_results.operational.productivity_index * 100) }}%
+                                    </span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: {{ results.kpi_results.operational.productivity_index * 100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- File Summary -->
+                <div class="card kpi-card">
+                    <div class="kpi-header">
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Uploaded Files</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for filename, summary in results.file_summary.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-truncate">{{ filename }}</span>
+                            <small class="text-muted">{{ summary }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card kpi-card">
+                    <div class="kpi-header">
+                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ url_for('questionnaire') }}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="fas fa-redo me-2"></i>Run New Analysis
+                        </a>
+                        <button class="btn btn-outline-secondary w-100 mb-2" onclick="window.print()">
+                            <i class="fas fa-print me-2"></i>Print Report
+                        </button>
+                        <button class="btn btn-outline-success w-100" onclick="downloadReport()">
+                            <i class="fas fa-download me-2"></i>Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Recommendations -->
+        {% if results.diagnostic_results %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card kpi-card">
+                    <div class="kpi-header">
+                        <h5 class="mb-0"><i class="fas fa-robot me-2"></i>AI Recommendations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="recommendation-item">
+                            <h6><i class="fas fa-lightbulb me-2"></i>Financial Optimization</h6>
+                            <p class="mb-0">Based on your current margins, consider implementing cost reduction strategies in operational expenses to improve net margin.</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <h6><i class="fas fa-users me-2"></i>HR Improvements</h6>
+                            <p class="mb-0">Your turnover rate suggests implementing employee retention programs and improving workplace culture.</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <h6><i class="fas fa-cogs me-2"></i>Process Efficiency</h6>
+                            <p class="mb-0">Consider automating routine tasks and optimizing workflows to improve productivity index.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Company Efficiency Optimizer. Powered by AI.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function downloadReport() {
+            // Create a simple text report
+            const report = generateReport();
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'efficiency-analysis-report.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function generateReport() {
+            const results = {{ results | tojson }};
+            let report = `Company Efficiency Analysis Report\n`;
+            report += `=====================================\n\n`;
+            report += `Company: ${results.company_name}\n`;
+            report += `Generated: ${new Date().toLocaleDateString()}\n\n`;
+            
+            if (results.kpi_results) {
+                report += `FINANCIAL KPIs\n`;
+                report += `--------------\n`;
+                report += `Gross Margin: ${(results.kpi_results.financial.gross_margin * 100).toFixed(1)}%\n`;
+                report += `Operating Margin: ${(results.kpi_results.financial.operating_margin * 100).toFixed(1)}%\n`;
+                report += `Net Margin: ${(results.kpi_results.financial.net_margin * 100).toFixed(1)}%\n`;
+                report += `Revenue per Employee: $${results.kpi_results.financial.revenue_per_employee.toLocaleString()}\n\n`;
+                
+                report += `HR KPIs\n`;
+                report += `--------\n`;
+                report += `Turnover Rate: ${(results.kpi_results.hr.turnover_rate * 100).toFixed(1)}%\n`;
+                report += `Total Employees: ${results.kpi_results.hr.total_employees}\n\n`;
+                
+                report += `OPERATIONAL KPIs\n`;
+                report += `----------------\n`;
+                report += `Cost Efficiency Ratio: ${(results.kpi_results.operational.cost_efficiency_ratio * 100).toFixed(1)}%\n`;
+                report += `Productivity Index: ${(results.kpi_results.operational.productivity_index * 100).toFixed(1)}%\n\n`;
+            }
+            
+            report += `RECOMMENDATIONS\n`;
+            report += `---------------\n`;
+            report += `1. Implement cost reduction strategies in operational expenses\n`;
+            report += `2. Develop employee retention programs\n`;
+            report += `3. Automate routine tasks and optimize workflows\n`;
+            report += `4. Regular monitoring of KPIs for continuous improvement\n`;
+            
+            return report;
+        }
+    </script>
+</body>
+</html>
