@@ -150,3 +150,7 @@ class OllamaDiagnosticCrew:
         """Run the diagnostic analysis"""
         crew = self.create_crew()
         return crew.kickoff()
+    
+    def run_diagnostic_analysis(self, sample_data):
+        """Run diagnostic analysis with sample data - alias for run_diagnostic"""
+        return self.run_diagnostic(sample_data)
