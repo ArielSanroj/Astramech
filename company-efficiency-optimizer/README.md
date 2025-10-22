@@ -1,23 +1,23 @@
 # Company Efficiency Optimizer
 
-A diagnostic and multi-agent architecture for company efficiency optimization, built with CrewAI and designed to identify inefficiencies in financial statements, HR metrics, and operational KPIs.
+A production-ready Flask web application for company efficiency optimization, built with CrewAI and Ollama. This system analyzes financial statements, HR metrics, and operational KPIs to identify inefficiencies and provide actionable recommendations.
 
 ## 🚀 Features
 
-- **Diagnostic Agent**: Analyzes P&L statements and identifies company inefficiencies
-- **Specialized Agents**: HR Optimizer, Operations Optimizer, and Financial Optimizer
-- **KPI Analysis**: Calculates financial ratios, turnover rates, and operational metrics
-- **Hybrid Memory**: Short-term (CrewAI) and long-term (Pinecone) memory systems
-- **Data Ingestion**: Supports multiple data sources (CSV, PDF, APIs)
-- **Industry Benchmarks**: Compares performance against industry standards
+- **Web Interface**: Modern Flask web application with Bootstrap UI
+- **Ollama Integration**: Local LLM processing with llama3.1:8b model
+- **KPI Analysis**: Comprehensive financial, HR, and operational metrics
+- **Data Processing**: Support for Excel, CSV, and PDF file uploads
+- **Industry Benchmarks**: Performance comparison against industry standards
+- **Session Management**: Secure user session handling
+- **Error Handling**: Comprehensive error handling and validation
+- **Testing Suite**: Unit and integration tests with pytest
 
 ## 📋 Prerequisites
 
 - Python 3.9+ (tested with 3.9.6)
-- API keys for:
-  - OpenAI (for LLM) or NVIDIA AI Endpoints
-  - Pinecone (for vector database)
-  - Optional: QuickBooks, BambooHR for data integration
+- Ollama installed and running locally
+- Optional: Pinecone API key for long-term memory
 
 ## 🛠️ Installation
 
@@ -34,13 +34,25 @@ A diagnostic and multi-agent architecture for company efficiency optimization, b
 
 3. **Install dependencies**
    ```bash
-   pip install crewai==0.1.32 langchain python-dotenv pandas numpy requests pinecone pytesseract pdf2image Pillow rich typer
+   pip install -r requirements.txt
    ```
 
-4. **Configure environment variables**
+4. **Set up Ollama**
    ```bash
-   cp .env.example .env
-   # Edit .env with your API keys
+   # Install Ollama (if not already installed)
+   curl -fsSL https://ollama.ai/install.sh | sh
+   
+   # Pull the required model
+   ollama pull llama3.1:8b
+   
+   # Start Ollama server
+   ollama serve
+   ```
+
+5. **Configure environment variables**
+   ```bash
+   cp env.example .env
+   # Edit .env with your configuration
    ```
 
 ## 🔧 Configuration
@@ -80,24 +92,35 @@ Defines the workflow tasks:
 
 ## 🚀 Usage
 
-### Quick Demo (No API Keys Required)
+### Start the Web Application
 
 ```bash
-python demo.py
+python run.py
 ```
 
-This demonstrates the system capabilities using sample data.
+The application will be available at `http://localhost:5001`
 
-### Full System (Requires API Keys)
+### Run Tests
 
 ```bash
-python main.py
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=app --cov=tools
+
+# Run specific test file
+pytest tests/test_app.py
 ```
 
-### Test Setup
+### Development Mode
 
 ```bash
-python test_setup.py
+# Set environment to development
+export FLASK_ENV=development
+
+# Run with debug mode
+python run.py
 ```
 
 ## 📊 System Architecture

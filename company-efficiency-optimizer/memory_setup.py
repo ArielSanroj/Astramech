@@ -290,6 +290,45 @@ class HybridMemorySystem:
                 summary += f"   - {memory['text']}\n"
         
         return summary
+    
+    def store_analysis_results(self, company_name: str, analysis_data: Dict[str, Any]) -> str:
+        """
+        Store analysis results in memory system
+        
+        Args:
+            company_name: Name of the company
+            analysis_data: Dictionary containing analysis results
+            
+        Returns:
+            str: Memory ID
+        """
+        try:
+            # Create a summary text for storage
+            summary_text = f"Analysis results for {company_name}: "
+            
+            if 'kpi_results' in analysis_data:
+                summary_text += "KPI analysis completed. "
+            
+            if 'diagnostic_results' in analysis_data:
+                summary_text += "Diagnostic analysis completed. "
+            
+            if 'questionnaire' in analysis_data:
+                summary_text += f"Questionnaire data for {analysis_data['questionnaire'].get('industry', 'unknown')} industry. "
+            
+            # Store in memory
+            memory_id = self.store_memory(summary_text, {
+                'company_name': company_name,
+                'analysis_type': 'efficiency_analysis',
+                'timestamp': datetime.now().isoformat(),
+                'data_keys': list(analysis_data.keys())
+            })
+            
+            print(f"✅ Stored analysis results for {company_name}")
+            return memory_id
+            
+        except Exception as e:
+            print(f"❌ Error storing analysis results: {str(e)}")
+            return None
 
 # Global memory instance
 memory_system = HybridMemorySystem()
