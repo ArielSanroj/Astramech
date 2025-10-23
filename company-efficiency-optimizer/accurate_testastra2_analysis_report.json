@@ -1,0 +1,97 @@
+{
+  "analysis_metadata": {
+    "timestamp": "2025-10-23T07:12:27.802055",
+    "version": "3.0",
+    "file": "testastra2.xlsx",
+    "company": "APRU SAS",
+    "period": "September 2024",
+    "accuracy": "High - Based on actual NIIF data",
+    "data_source": "ER (P&L) and ESF (Balance Sheet) sheets"
+  },
+  "company_info": {
+    "name": "APRU SAS",
+    "industry": "professional_services",
+    "employee_count": 6,
+    "currency": "COP",
+    "period": "September 2024"
+  },
+  "financial_performance": {
+    "revenue": 496910820.0,
+    "cogs": 171479869.0,
+    "operating_expenses": 292439703.61,
+    "operating_income": 193750140.39,
+    "net_income": 187079080.19,
+    "gross_margin": 0.6549081603817763,
+    "operating_margin": 0.3899092806834031,
+    "net_margin": 0.37648421539704047
+  },
+  "balance_sheet": {
+    "total_assets": 1397989689.93,
+    "cash_and_equivalents": 14283817.64,
+    "receivables": 95770036.0,
+    "fixed_assets": 325512964.0,
+    "investments": 0.0
+  },
+  "kpi_analysis": {
+    "gross_margin": 0.6549081603817763,
+    "operating_margin": 0.3899092806834031,
+    "net_margin": 0.37648421539704047,
+    "revenue_per_employee": 82818470.0,
+    "current_ratio": 0.37633006832331056,
+    "asset_utilization": 0.3554466986268556
+  },
+  "inefficiencies": [
+    {
+      "issue_type": "liquidity",
+      "kpi_name": "Current Ratio",
+      "current_value": 0.37633006832331056,
+      "benchmark": 1.5,
+      "severity": "critical",
+      "description": "Low liquidity: 0.38 vs benchmark 1.5",
+      "recommended_agent": "financial_optimizer"
+    },
+    {
+      "issue_type": "asset_utilization",
+      "kpi_name": "Asset Utilization",
+      "current_value": 0.3554466986268556,
+      "benchmark": 0.5,
+      "severity": "critical",
+      "description": "Low asset utilization: 35.5% vs benchmark 50%",
+      "recommended_agent": "asset_optimizer"
+    }
+  ],
+  "recommended_agents": [
+    {
+      "name": "Financial Optimizer",
+      "department": "Finance",
+      "priority": "High",
+      "goal": "Improve liquidity to Current Ratio 1.5+ by optimizing receivables collection",
+      "tasks": [
+        "Implement receivables collection process",
+        "Negotiate payment terms with customers",
+        "Monitor cash flow weekly",
+        "Optimize working capital management"
+      ]
+    },
+    {
+      "name": "Asset Utilization Agent",
+      "department": "Operations",
+      "priority": "Critical",
+      "goal": "Boost revenue to 700M+ by leveraging 1.4B assets",
+      "tasks": [
+        "Analyze underutilized assets",
+        "Develop asset monetization strategies",
+        "Optimize asset allocation",
+        "Implement asset tracking system"
+      ]
+    }
+  ],
+  "data_quality_notes": [
+    "Data extracted from actual NIIF financial statements",
+    "Employee count estimated from admin expenses",
+    "No fabricated Marketing/IT data included",
+    "All calculations based on real financial data",
+    "Currency validation applied (COP)",
+    "Industry classification: Professional Services"
+  ]
+}

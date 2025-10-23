@@ -1,0 +1,177 @@
+{
+  "analysis_metadata": {
+    "timestamp": "2025-10-23T05:45:10.353238",
+    "version": "2.0",
+    "test_file": "testastra2.xlsx",
+    "data_source": "Balance sheet extraction + enhanced ingestion",
+    "improvements": [
+      "Enhanced NIIF/Colombian format support",
+      "YTD calculations and validation",
+      "Department-specific KPI analysis",
+      "Dynamic agent generation",
+      "Real-time streaming capabilities",
+      "Balance sheet data extraction"
+    ]
+  },
+  "company_info": {
+    "name": "TESTASTRA2 COMPANY",
+    "industry": "retail",
+    "employee_count": 10,
+    "currency": "COP",
+    "department": "Finance"
+  },
+  "financial_summary": {
+    "revenue_ytd": 2487834513.15,
+    "operating_expenses_ytd": 695039767.2,
+    "net_income_ytd": 1792794745.95,
+    "total_assets": 6989948446.950001,
+    "employee_estimate_method": "Payroll-based estimation from operating expenses",
+    "balance_sheet_data": {
+      "revenue": 2487834513.15,
+      "expenses": 695039767.2,
+      "assets": 6989948446.950001,
+      "net_income": 1792794745.95,
+      "revenue_accounts": 17,
+      "expense_accounts": 65,
+      "asset_accounts": 62
+    }
+  },
+  "kpi_analysis": {
+    "finance": {
+      "financial": {
+        "gross_margin": 0.3,
+        "operating_margin": 0.15,
+        "net_margin": 0.7206245980083428,
+        "revenue_per_employee": 248783451.315
+      },
+      "hr": {
+        "turnover_rate": 0.15,
+        "total_employees": 10
+      },
+      "operational": {
+        "cost_efficiency_ratio": 0.27937540199165717,
+        "productivity_index": 0.8
+      },
+      "department": {
+        "name": "Finance",
+        "kpis": {},
+        "benchmarks": {}
+      },
+      "inefficiencies": []
+    },
+    "marketing": {
+      "financial": {
+        "gross_margin": 0.3,
+        "operating_margin": 0.15,
+        "net_margin": 0.7206245980083428,
+        "revenue_per_employee": 248783451.315
+      },
+      "hr": {
+        "turnover_rate": 0.15,
+        "total_employees": 10
+      },
+      "operational": {
+        "cost_efficiency_ratio": 0.27937540199165717,
+        "productivity_index": 0.8
+      },
+      "department": {
+        "name": "Marketing",
+        "kpis": {
+          "Marketing Roi": 7.158826388229143,
+          "Customer Acquisition Cost": 50000,
+          "Customer Lifetime Value": 0.0,
+          "Conversion Rate": 2.5,
+          "Marketing Spend Ratio": 0.0
+        },
+        "benchmarks": {
+          "Marketing Roi": 5.0,
+          "Customer Acquisition Cost": 50000,
+          "Customer Lifetime Value": 500000,
+          "Conversion Rate": 2.5,
+          "Marketing Spend Ratio": 0.15
+        }
+      },
+      "inefficiencies": [
+        {
+          "issue_type": "general_performance",
+          "kpi_name": "Customer Lifetime Value",
+          "current_value": 0.0,
+          "benchmark": 500000,
+          "severity": "critical",
+          "description": "Total value of a customer (COP)",
+          "recommended_agent": "diagnostic_agent"
+        },
+        {
+          "issue_type": "general_performance",
+          "kpi_name": "Marketing Spend Ratio",
+          "current_value": 0.0,
+          "benchmark": 0.15,
+          "severity": "critical",
+          "description": "Marketing spend as % of revenue",
+          "recommended_agent": "diagnostic_agent"
+        }
+      ]
+    },
+    "it": {
+      "financial": {
+        "gross_margin": 0.3,
+        "operating_margin": 0.15,
+        "net_margin": 0.7206245980083428,
+        "revenue_per_employee": 248783451.315
+      },
+      "hr": {
+        "turnover_rate": 0.15,
+        "total_employees": 10
+      },
+      "operational": {
+        "cost_efficiency_ratio": 0.27937540199165717,
+        "productivity_index": 0.8
+      },
+      "department": {
+        "name": "IT",
+        "kpis": {
+          "System Uptime": 99.9,
+          "Response Time": 200,
+          "Security Incidents": 0,
+          "Project Delivery Time": 0.0,
+          "It Cost Ratio": 0.0
+        },
+        "benchmarks": {
+          "System Uptime": 99.9,
+          "Response Time": 200,
+          "Security Incidents": 0,
+          "Project Delivery Time": 0.9,
+          "It Cost Ratio": 0.05
+        }
+      },
+      "inefficiencies": [
+        {
+          "issue_type": "general_performance",
+          "kpi_name": "Project Delivery Time",
+          "current_value": 0.0,
+          "benchmark": 0.9,
+          "severity": "critical",
+          "description": "Projects delivered on time ratio",
+          "recommended_agent": "diagnostic_agent"
+        },
+        {
+          "issue_type": "operational_efficiency",
+          "kpi_name": "It Cost Ratio",
+          "current_value": 0.0,
+          "benchmark": 0.05,
+          "severity": "critical",
+          "description": "IT costs as % of revenue",
+          "recommended_agent": "operations_optimizer"
+        }
+      ]
+    }
+  },
+  "agent_recommendations": [],
+  "data_quality_notes": [
+    "Employee count estimated from payroll data",
+    "YTD calculations from ERI sheets",
+    "Currency validation applied",
+    "Industry classification performed",
+    "Balance sheet data extracted and integrated"
+  ]
+}

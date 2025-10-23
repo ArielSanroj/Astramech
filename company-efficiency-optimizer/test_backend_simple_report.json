@@ -1,0 +1,33 @@
+{
+  "company_info": {
+    "name": "CARMANFE SAS",
+    "industry": "services",
+    "employee_count": 66,
+    "currency": "COP"
+  },
+  "financial_summary": {
+    "total_assets": 9998415695.16,
+    "revenue": 20000000.0,
+    "net_income": 3033656.5600000005,
+    "gross_profit": 20000000.0,
+    "operating_income": 3563071.5700000003
+  },
+  "kpi_analysis": {
+    "financial": {
+      "gross_margin": 0.3,
+      "operating_margin": 0.15,
+      "net_margin": 0.15168282800000002,
+      "revenue_per_employee": 250000
+    },
+    "hr": {
+      "turnover_rate": 0.15,
+      "total_employees": 66
+    },
+    "operational": {
+      "cost_efficiency_ratio": 0.8218464215,
+      "productivity_index": 0.8
+    }
+  },
+  "ai_analysis": "AI analysis not available",
+  "timestamp": "2025-10-22T05:15:39.722225"
+}
