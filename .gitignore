@@ -14,3 +14,4 @@ venv.bak/
 temp_*.json
 uploads/
 .DS_Store
+company-efficiency-optimizer/venv312/
