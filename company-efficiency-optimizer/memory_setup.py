@@ -215,6 +215,30 @@ class HybridMemorySystem:
         }
         
         return self.store_memory(text, metadata)
+
+    def store_analysis_results(self, company_name: str, analysis: Dict[str, Any]) -> str:
+        """Persist high-level analysis results for later retrieval"""
+
+        if not analysis:
+            return None
+
+        company = company_name or "Unknown"
+        try:
+            summary = json.dumps(analysis, default=str)
+        except TypeError:
+            summary = str(analysis)
+
+        metadata = {
+            'type': 'analysis_results',
+            'company': company,
+            'has_kpi_results': 'kpi_results' in analysis,
+            'has_diagnostic_results': 'diagnostic_results' in analysis
+        }
+
+        return self.store_memory(
+            f"Analysis results for {company}",
+            {**metadata, 'raw_results': summary}
+        )
     
     def get_kpi_trends(self, kpi_name: str, periods: int = 4) -> List[Dict[str, Any]]:
         """

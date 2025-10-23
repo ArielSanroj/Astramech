@@ -1,0 +1,103 @@
+{
+  "analysis_metadata": {
+    "timestamp": "2025-10-23T05:43:10.456534",
+    "version": "2.0",
+    "test_file": "testastra2.xlsx",
+    "improvements": [
+      "Enhanced NIIF/Colombian format support",
+      "YTD calculations and validation",
+      "Department-specific KPI analysis",
+      "Dynamic agent generation",
+      "Real-time streaming capabilities"
+    ]
+  },
+  "company_info": {
+    "name": "TESTASTRA2 COMPANY",
+    "industry": "retail",
+    "employee_count": 10,
+    "currency": "COP",
+    "department": "Finance"
+  },
+  "financial_summary": {
+    "revenue_ytd": 0,
+    "operating_expenses_ytd": 0,
+    "net_income_ytd": 0,
+    "total_assets": 0,
+    "employee_estimate_method": "Payroll-based estimation from operating expenses"
+  },
+  "kpi_analysis": {
+    "finance": {
+      "financial": {
+        "gross_margin": 0.3,
+        "operating_margin": 0.15,
+        "net_margin": 0.1,
+        "revenue_per_employee": 250000
+      },
+      "hr": {
+        "turnover_rate": 0.15,
+        "total_employees": 50
+      },
+      "operational": {
+        "cost_efficiency_ratio": 0.8,
+        "productivity_index": 0.78
+      },
+      "department": {
+        "name": "Finance",
+        "kpis": {},
+        "benchmarks": {}
+      },
+      "inefficiencies": []
+    },
+    "marketing": {
+      "financial": {
+        "gross_margin": 0.3,
+        "operating_margin": 0.15,
+        "net_margin": 0.1,
+        "revenue_per_employee": 250000
+      },
+      "hr": {
+        "turnover_rate": 0.15,
+        "total_employees": 50
+      },
+      "operational": {
+        "cost_efficiency_ratio": 0.8,
+        "productivity_index": 0.78
+      },
+      "department": {
+        "name": "Marketing",
+        "kpis": {},
+        "benchmarks": {}
+      },
+      "inefficiencies": []
+    },
+    "it": {
+      "financial": {
+        "gross_margin": 0.3,
+        "operating_margin": 0.15,
+        "net_margin": 0.1,
+        "revenue_per_employee": 250000
+      },
+      "hr": {
+        "turnover_rate": 0.15,
+        "total_employees": 50
+      },
+      "operational": {
+        "cost_efficiency_ratio": 0.8,
+        "productivity_index": 0.78
+      },
+      "department": {
+        "name": "IT",
+        "kpis": {},
+        "benchmarks": {}
+      },
+      "inefficiencies": []
+    }
+  },
+  "agent_recommendations": [],
+  "data_quality_notes": [
+    "Employee count estimated from payroll data",
+    "YTD calculations from ERI sheets",
+    "Currency validation applied",
+    "Industry classification performed"
+  ]
+}

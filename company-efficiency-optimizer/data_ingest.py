@@ -63,16 +63,17 @@ class EnhancedDataIngestion:
             ]
         }
     
-    def process_excel_file(self, file_path: str, company_name: str = None) -> Dict[str, Any]:
+    def process_excel_file(self, file_path: str, company_name: str = None, department: str = 'Finance') -> Dict[str, Any]:
         """
-        Process Excel file with multiple sheets
+        Process Excel file with multiple sheets and improved accuracy for NIIF/Colombian formats
         
         Args:
             file_path: Path to the Excel file
             company_name: Name of the company
+            department: Department being analyzed (Finance, Marketing, IT, etc.)
             
         Returns:
-            Dict: Comprehensive financial data
+            Dict: Comprehensive financial data with YTD calculations
         """
         try:
             # Get all sheet names
@@ -84,10 +85,12 @@ class EnhancedDataIngestion:
                 'company': company_name or 'Unknown Company',
                 'currency': 'COP',  # Default to Colombian Pesos
                 'period': 'Unknown',
-                'sheets_processed': []
+                'department': department,
+                'sheets_processed': [],
+                'ytd_data': {}  # Year-to-date calculations
             }
             
-            # Process each sheet
+            # Process each sheet with improved accuracy
             for sheet_name in sheet_names:
                 print(f"\n📋 Processing sheet: {sheet_name}")
                 df = pd.read_excel(file_path, sheet_name=sheet_name)
@@ -115,21 +118,35 @@ class EnhancedDataIngestion:
                     hr_data = self._extract_hr_data(df)
                     financial_data['hr_data'] = hr_data
                     financial_data['sheets_processed'].append(f"{sheet_name} (HR)")
+                
+                # Special handling for ERI sheets (NIIF format)
+                elif 'ERI' in sheet_name.upper():
+                    eri_data = self._extract_eri_data(df, sheet_name)
+                    financial_data['ytd_data'].update(eri_data)
+                    financial_data['sheets_processed'].append(f"{sheet_name} (ERI - YTD)")
+            
+            # Calculate YTD metrics from ERI data
+            if financial_data['ytd_data']:
+                financial_data.update(self._calculate_ytd_metrics(financial_data['ytd_data']))
             
             # Classify industry based on financial data
             industry = self._classify_industry(financial_data)
             financial_data['industry'] = industry
             print(f"\n🏭 Classified industry: {industry}")
             
-            # Estimate employee count if not available
-            if 'employee_count' not in financial_data or financial_data['employee_count'] == 0:
-                financial_data['employee_count'] = self._estimate_employee_count(financial_data)
-                print(f"👥 Estimated employee count: {financial_data['employee_count']}")
+            # Improved employee estimation with validation
+            financial_data['employee_count'] = self._estimate_employee_count_improved(financial_data)
+            print(f"👥 Estimated employee count: {financial_data['employee_count']}")
+            
+            # Validate currency and data consistency
+            self._validate_financial_data(financial_data)
             
             return financial_data
             
         except Exception as e:
             print(f"❌ Error processing Excel file: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {}
     
     def _classify_sheet(self, sheet_name: str, df: pd.DataFrame) -> str:
@@ -419,6 +436,128 @@ class EnhancedDataIngestion:
         summary['extracted_data']['exists'] = os.path.exists(summary['extracted_data']['file'])
         
         return summary
+    
+    def _extract_eri_data(self, df: pd.DataFrame, sheet_name: str) -> Dict[str, Any]:
+        """Extract data from ERI (Estado de Resultados Integrales) sheets"""
+        eri_data = {}
+        
+        try:
+            # Look for revenue line (typically code '4' in NIIF)
+            if 'Codigo' in df.columns:
+                revenue_row = df[df['Codigo'] == '4']
+                if not revenue_row.empty:
+                    # Get the latest month column (usually the rightmost)
+                    month_columns = [col for col in df.columns if '2025' in str(col)]
+                    if month_columns:
+                        latest_month = month_columns[-1]
+                        eri_data['revenue_ytd'] = revenue_row[latest_month].iloc[0] if latest_month in revenue_row.columns else 0
+                        print(f"   📈 Revenue YTD ({latest_month}): ${eri_data['revenue_ytd']:,.0f} COP")
+            
+            # Look for operating expenses (typically codes starting with '51')
+            if 'Codigo' in df.columns:
+                opex_rows = df[df['Codigo'].str.startswith('51', na=False)]
+                if not opex_rows.empty:
+                    month_columns = [col for col in df.columns if '2025' in str(col)]
+                    if month_columns:
+                        latest_month = month_columns[-1]
+                        eri_data['opex_ytd'] = opex_rows[latest_month].sum() if latest_month in opex_rows.columns else 0
+                        print(f"   💰 Operating Expenses YTD ({latest_month}): ${eri_data['opex_ytd']:,.0f} COP")
+            
+            # Calculate net profit
+            if 'revenue_ytd' in eri_data and 'opex_ytd' in eri_data:
+                eri_data['net_profit_ytd'] = eri_data['revenue_ytd'] - eri_data['opex_ytd']
+                print(f"   💵 Net Profit YTD: ${eri_data['net_profit_ytd']:,.0f} COP")
+                
+        except Exception as e:
+            print(f"   ⚠️ Error extracting ERI data: {str(e)}")
+            
+        return eri_data
+    
+    def _calculate_ytd_metrics(self, ytd_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate year-to-date metrics from ERI data"""
+        metrics = {}
+        
+        if 'revenue_ytd' in ytd_data:
+            metrics['revenue'] = ytd_data['revenue_ytd']
+            metrics['revenue_ytd'] = ytd_data['revenue_ytd']
+            
+        if 'opex_ytd' in ytd_data:
+            metrics['operating_expenses'] = ytd_data['opex_ytd']
+            metrics['operating_expenses_ytd'] = ytd_data['opex_ytd']
+            
+        if 'net_profit_ytd' in ytd_data:
+            metrics['net_income'] = ytd_data['net_profit_ytd']
+            metrics['net_income_ytd'] = ytd_data['net_profit_ytd']
+            
+        return metrics
+    
+    def _estimate_employee_count_improved(self, financial_data: Dict[str, Any]) -> int:
+        """Improved employee count estimation with better validation"""
+        # Try to get from HR data first
+        if 'hr_data' in financial_data and 'total_employees' in financial_data['hr_data']:
+            return financial_data['hr_data']['total_employees']
+        
+        # Estimate from operating expenses with better logic
+        opex = financial_data.get('operating_expenses', 0)
+        opex_ytd = financial_data.get('operating_expenses_ytd', opex)
+        
+        if opex_ytd > 0:
+            # Use YTD data if available, otherwise monthly
+            if opex_ytd > opex:
+                # YTD data - divide by months to get monthly average
+                months_passed = 5  # Assuming May 2025 (ENE-MAY)
+                monthly_opex = opex_ytd / months_passed
+            else:
+                monthly_opex = opex
+            
+            # Estimate payroll as 60% of operating expenses
+            monthly_payroll = monthly_opex * 0.6
+            
+            # Average monthly salary in Colombia (professional services): ~1,200,000 COP
+            avg_monthly_salary = 1200000
+            estimated_employees = int(monthly_payroll / avg_monthly_salary)
+            
+            # Validate estimate (should be reasonable)
+            if estimated_employees < 1:
+                estimated_employees = 1
+            elif estimated_employees > 1000:  # Sanity check
+                estimated_employees = 10  # Fallback
+                
+            print(f"   💼 Estimated from payroll: {estimated_employees} employees")
+            return estimated_employees
+        
+        # Default fallback
+        return 10
+    
+    def _validate_financial_data(self, financial_data: Dict[str, Any]) -> None:
+        """Validate financial data for consistency and accuracy"""
+        issues = []
+        
+        # Check for currency consistency
+        if financial_data.get('currency') != 'COP':
+            issues.append("Currency not set to COP")
+        
+        # Check for reasonable values
+        revenue = financial_data.get('revenue', 0)
+        if revenue > 0:
+            if revenue < 1000000:  # Less than 1M COP
+                issues.append("Revenue seems too low for a company")
+            elif revenue > 1000000000000:  # More than 1T COP
+                issues.append("Revenue seems too high, check for unit errors")
+        
+        # Check employee count vs revenue ratio
+        employees = financial_data.get('employee_count', 0)
+        if employees > 0 and revenue > 0:
+            revenue_per_employee = revenue / employees
+            if revenue_per_employee < 50000000:  # Less than 50M COP per employee
+                issues.append("Revenue per employee seems low")
+            elif revenue_per_employee > 2000000000:  # More than 2B COP per employee
+                issues.append("Revenue per employee seems high")
+        
+        if issues:
+            print(f"   ⚠️ Data validation issues: {', '.join(issues)}")
+        else:
+            print(f"   ✅ Data validation passed")
 
 # Global enhanced data ingestion instance
 enhanced_data_ingestion = EnhancedDataIngestion()

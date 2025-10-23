@@ -11,7 +11,7 @@ numpy>=1.24.0
 python-dotenv>=1.0.0
 
 # Vector database and embeddings
-pinecone-client>=3.0.0
+pinecone>=3.0.0
 PyYAML>=6.0.0
 
 # PDF processing and OCR
