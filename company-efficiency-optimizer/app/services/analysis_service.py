@@ -8,7 +8,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from data_ingest import DataIngestion
+from data_ingest import EnhancedDataIngestion
 from tools.kpi_calculator import KPICalculator
 from memory_setup import HybridMemorySystem
 from ollama_crew import OllamaDiagnosticCrew
@@ -20,7 +20,7 @@ class AnalysisService:
     
     def __init__(self):
         """Initialize the analysis service with required components"""
-        self.data_ingestion = DataIngestion()
+        self.data_ingestion = EnhancedDataIngestion()
         self.kpi_calculator = KPICalculator()
         self.memory_system = HybridMemorySystem()
         self.diagnostic_crew = OllamaDiagnosticCrew()

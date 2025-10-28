@@ -18,11 +18,31 @@ class OllamaDiagnosticCrew:
     def __init__(self):
         """Initialize the crew with Ollama LLM"""
         # Initialize Ollama LLM
-        self.llm = ChatOllama(
-            model=os.getenv("OLLAMA_MODEL", "llama3.1:8b"),
-            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
-            temperature=0.7
-        )
+        # Prefer env override; fallback to a commonly available local model with graceful fallback chain
+        base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        preferred = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+        fallbacks = [
+            preferred,
+            "llama3.2:3b",
+            "llama3:8b",
+            "mistral:7b"
+        ]
+        self.llm = None
+        last_err = None
+        for model_name in fallbacks:
+            try:
+                self.llm = ChatOllama(
+                    model=model_name,
+                    base_url=base_url,
+                    temperature=0.7
+                )
+                # Quick no-op call path may still fail at runtime; we rely on runtime error handling below
+                break
+            except Exception as e:  # model may not exist; try next
+                last_err = e
+                continue
+        if self.llm is None:
+            print(f"❌ Failed to initialize Ollama model. Last error: {last_err}")
         
         # Load configurations
         self.agents_config = self._load_yaml_config('config/agents.yaml')
@@ -148,8 +168,13 @@ class OllamaDiagnosticCrew:
     
     def run_diagnostic(self, initial_data=None):
         """Run the diagnostic analysis"""
+        if self.llm is None:
+            return {"diagnostic": "LLM unavailable; skipping diagnostic.", "agents": []}
         crew = self.create_crew()
-        return crew.kickoff()
+        try:
+            return crew.kickoff()
+        except Exception as e:
+            return {"diagnostic": f"Diagnostic skipped due to LLM error: {e}", "agents": []}
     
     def run_diagnostic_analysis(self, sample_data):
         """Run diagnostic analysis with sample data - alias for run_diagnostic"""

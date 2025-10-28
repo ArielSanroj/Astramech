@@ -13,7 +13,9 @@ from errors import register_error_handlers
 def create_app(config_name=None):
     """Create and configure the Flask application"""
     
-    app = Flask(__name__)
+    # Ensure Flask uses the top-level templates directory
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
+    app = Flask(__name__, template_folder=template_dir)
     
     # Load configuration
     if config_name is None:
