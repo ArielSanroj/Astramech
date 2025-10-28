@@ -10,8 +10,16 @@ import os
 import uuid
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
-from pinecone import Pinecone, ServerlessSpec
-from langchain_ollama import OllamaEmbeddings
+try:
+    from pinecone import Pinecone, ServerlessSpec
+except Exception as e:  # noqa: F841
+    Pinecone = None
+    ServerlessSpec = None
+
+try:
+    from langchain_ollama import OllamaEmbeddings
+except Exception as e:  # noqa: F841
+    OllamaEmbeddings = None
 import json
 from datetime import datetime
 
@@ -23,12 +31,17 @@ class HybridMemorySystem:
     def __init__(self):
         """Initialize the memory system"""
         try:
+            if Pinecone is None:
+                raise RuntimeError("Pinecone SDK not available")
             self.pc = Pinecone(api_key=os.getenv('PINECONE_API_KEY'))
             self.index_name = 'company-efficiency-memory-4096'
-            self.embeddings = OllamaEmbeddings(
-                model="llama3.1:8b",
-                base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-            )
+            if OllamaEmbeddings is not None:
+                self.embeddings = OllamaEmbeddings(
+                    model="llama3.1:8b",
+                    base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+                )
+            else:
+                self.embeddings = None
             
             # Create or get the Pinecone index
             self._setup_index()
@@ -85,8 +98,11 @@ class HybridMemorySystem:
             # Generate unique ID
             memory_id = str(uuid.uuid4())
             
-            # Create embedding
-            embedding = self.embeddings.embed_query(text)
+            # Create embedding (fallback to zeros if embeddings not available)
+            if self.embeddings is not None:
+                embedding = self.embeddings.embed_query(text)
+            else:
+                embedding = [0.0] * 4096
             
             # Prepare metadata
             if metadata is None:

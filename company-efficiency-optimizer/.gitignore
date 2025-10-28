@@ -1,4 +1,4 @@
-.env
+flask_session/
+.DS_Store
 __pycache__/
-.pytest_cache/
-*.pyc
+.env

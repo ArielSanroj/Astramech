@@ -8,9 +8,9 @@ from werkzeug.exceptions import RequestEntityTooLarge
 import os
 import pandas as pd
 import logging
-# from app.services.analysis_service import AnalysisService
-# from app.utils.validators import validate_questionnaire_data, validate_file_upload
-# from app.utils.errors import ValidationError, FileProcessingError
+from app.services.analysis_service import AnalysisService
+from app.utils.validators import validate_questionnaire_data, validate_file_upload
+from app.utils.errors import ValidationError, FileProcessingError
 
 logger = logging.getLogger(__name__)
 

@@ -31,8 +31,10 @@ if __name__ == '__main__':
     print(f"   Upload folder: {app.config.get('UPLOAD_FOLDER', 'uploads')}")
     print(f"   Max file size: {app.config.get('MAX_FILE_SIZE', 16 * 1024 * 1024) / (1024 * 1024):.1f}MB")
     
+    # Allow overriding port via environment variables
+    port = int(os.getenv('PORT', os.getenv('FLASK_RUN_PORT', 5001)))
     app.run(
         host='0.0.0.0',
-        port=5001,
+        port=port,
         debug=app.config.get('DEBUG', False)
     )
