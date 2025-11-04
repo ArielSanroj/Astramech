@@ -1,179 +1,427 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Company Efficiency Optimizer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+{% extends 'base.html' %}
+{% block title %}AstraMech - Optimize Any Business Area with AI Agents{% endblock %}
+{% block meta_description %}AstraMech analyzes your data against 2025 industry benchmarks and deploys tailored AI agents to drive measurable improvements across all business areas.{% endblock %}
+{% block content %}
     <style>
         .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(11, 17, 32, 0.95) 0%, rgba(20, 27, 53, 0.95) 100%);
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
         }
-        .feature-card {
-            transition: transform 0.3s ease;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(123, 97, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
         }
-        .feature-card:hover {
+        
+        .badge-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        
+        .badge-pill {
+            background: rgba(45, 47, 72, 0.8);
+            border: 1px solid rgba(123, 97, 255, 0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            color: var(--color-text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .agent-card {
+            background: var(--color-surface);
+            border: 1px solid rgba(123, 97, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+        
+        .agent-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(123, 97, 255, 0.2);
+            border-color: rgba(123, 97, 255, 0.3);
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
         }
-        .btn-outline-primary {
-            border: 2px solid #667eea;
-            color: #667eea;
-            padding: 12px 30px;
-            border-radius: 25px;
+        
+        .status-active {
+            background: var(--color-primary-gradient);
+            color: white;
         }
-        .btn-outline-primary:hover {
-            background: #667eea;
-            border-color: #667eea;
+        
+        .status-idle {
+            background: var(--color-secondary);
+            color: var(--color-text-secondary);
+        }
+        
+        .capability-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .capability-list li {
+            color: var(--color-text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .capability-list li:before {
+            content: "•";
+            color: var(--color-primary);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .trigger-tag {
+            display: inline-block;
+            background: var(--color-surface-alt);
+            color: var(--color-text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            border: 1px solid rgba(123, 97, 255, 0.1);
+        }
+        
+        .recommendation-card {
+            background: var(--color-surface);
+            border: 1px solid rgba(123, 97, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(123, 97, 255, 0.2);
+            border-color: rgba(123, 97, 255, 0.3);
+        }
+        
+        .impact-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .impact-high {
+            background: rgba(255, 176, 32, 0.2);
+            color: var(--color-highlight);
+            border: 1px solid rgba(255, 176, 32, 0.3);
+        }
+        
+        .impact-critical {
+            background: rgba(255, 85, 85, 0.2);
+            color: var(--color-danger);
+            border: 1px solid rgba(255, 85, 85, 0.3);
+        }
+        
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-title {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Imágenes con lazy loading */
+        img {
+            loading: lazy;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
         }
     </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-chart-line me-2"></i>
-                Company Efficiency Optimizer
-            </a>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
+    
+    <!-- H1: Hero Section -->
     <section class="hero-section">
-        <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-4">Optimize Your Company's Efficiency</h1>
-            <p class="lead mb-5">AI-powered analysis to identify inefficiencies and improve your business performance</p>
-            <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-lg me-3">
-                <i class="fas fa-play me-2"></i>Start Analysis
-            </a>
-            <a href="#features" class="btn btn-outline-light btn-lg">
-                <i class="fas fa-info-circle me-2"></i>Learn More
+        <div class="container text-center position-relative">
+            <h1 class="hero-title">
+                Optimize Any Business Area<br/>
+                <span style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    with AI Agents Tailored to Your KPIs
+                </span>
+            </h1>
+            <p class="hero-subtitle">
+                Upload data from any department—Sales, IT, Marketing, HR, R&D, and more—to get specialized AI agents that identify inefficiencies and drive measurable improvements.
+            </p>
+            <div class="badge-section">
+                <span class="badge-pill">2025 Benchmarks</span>
+                <span class="badge-pill">All Departments</span>
+                <span class="badge-pill">Custom AI Agents</span>
+            </div>
+            <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-lg mt-3">
+                Get Started →
             </a>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-5">
+    <!-- H2: AI Agent System -->
+    <section id="agents" style="background: var(--color-bg);">
         <div class="container">
-            <div class="row text-center mb-5">
-                <div class="col-12">
-                    <h2 class="display-5 fw-bold">How It Works</h2>
-                    <p class="lead text-muted">Simple steps to comprehensive business analysis</p>
-                </div>
+            <h2 class="section-title text-center mb-3">AI Agent System</h2>
+            <p class="lead text-center mb-5" style="max-width: 900px; margin: 0 auto; color: var(--color-text-secondary);">
+                Multi-agent architecture powered by CrewAI, coordinating specialized AI agents for comprehensive business analysis
+            </p>
+            
+            <div class="mb-5">
+                <h3 class="h4 fw-bold mb-3" style="color: var(--color-primary);">Multi-Agent Architecture</h3>
+                <p class="mb-4" style="color: var(--color-text-secondary);">
+                    AstraMech uses a coordinated system of specialized AI agents powered by CrewAI, Ollama (llama3.1:8b), and Pinecone for long-term memory. Each agent focuses on specific business areas while the Diagnostic Agent orchestrates the overall analysis.
+                </p>
             </div>
+
             <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card h-100 text-center p-4">
-                        <div class="card-body">
-                            <i class="fas fa-clipboard-list fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">1. Complete Questionnaire</h5>
-                            <p class="card-text">Answer questions about your company, industry, and goals to provide context for the analysis.</p>
+                <!-- Diagnostic Agent -->
+                <article class="col-lg-6 mb-4">
+                    <div class="agent-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="h5 fw-bold mb-1">Diagnostic Agent</h3>
+                                <p class="text-muted mb-0">Coordinator</p>
+                            </div>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <p class="mb-3"><strong>Principal Coordinator</strong></p>
+                        <p class="mb-3" style="color: var(--color-text-secondary);">Orchestrates all analysis, identifies general inefficiencies, and generates executive reports</p>
+                        <div class="mb-3">
+                            <strong>Capabilities</strong>
+                            <ul class="capability-list mt-2">
+                                <li>General inefficiency detection</li>
+                                <li>Executive report generation</li>
+                                <li>Multi-agent coordination</li>
+                                <li>Strategic recommendations</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Triggered By</strong>
+                            <div class="mt-2">
+                                <span class="trigger-tag">All data uploads</span>
+                                <span class="trigger-tag">Comprehensive analysis</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card h-100 text-center p-4">
-                        <div class="card-body">
-                            <i class="fas fa-file-upload fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">2. Upload Documents</h5>
-                            <p class="card-text">Upload your financial statements, HR data, and operational reports in PDF or Excel format.</p>
+                </article>
+
+                <!-- HR Optimizer -->
+                <article class="col-lg-6 mb-4">
+                    <div class="agent-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="h5 fw-bold mb-1">HR Optimizer</h3>
+                                <p class="text-muted mb-0">Human Resources Specialist</p>
+                            </div>
+                            <span class="status-badge status-idle">Idle</span>
+                        </div>
+                        <p class="mb-3" style="color: var(--color-text-secondary);">Analyzes HR metrics, calculates turnover rates, and optimizes talent management</p>
+                        <div class="mb-3">
+                            <strong>Capabilities</strong>
+                            <ul class="capability-list mt-2">
+                                <li>Turnover rate analysis</li>
+                                <li>Productivity metrics</li>
+                                <li>Talent optimization</li>
+                                <li>Employee engagement insights</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Triggered By</strong>
+                            <div class="mt-2">
+                                <span class="trigger-tag">HR data</span>
+                                <span class="trigger-tag">Employee metrics</span>
+                                <span class="trigger-tag">Headcount reports</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card h-100 text-center p-4">
-                        <div class="card-body">
-                            <i class="fas fa-chart-bar fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">3. Get Insights</h5>
-                            <p class="card-text">Receive detailed KPI analysis, inefficiency detection, and actionable recommendations.</p>
+                </article>
+
+                <!-- Operations Optimizer -->
+                <article class="col-lg-6 mb-4">
+                    <div class="agent-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="h5 fw-bold mb-1">Operations Optimizer</h3>
+                                <p class="text-muted mb-0">Process Efficiency Expert</p>
+                            </div>
+                            <span class="status-badge status-idle">Idle</span>
+                        </div>
+                        <p class="mb-3" style="color: var(--color-text-secondary);">Evaluates operational efficiency, analyzes business processes, and identifies bottlenecks</p>
+                        <div class="mb-3">
+                            <strong>Capabilities</strong>
+                            <ul class="capability-list mt-2">
+                                <li>Process efficiency analysis</li>
+                                <li>Bottleneck identification</li>
+                                <li>Cost optimization</li>
+                                <li>Workflow improvement</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Triggered By</strong>
+                            <div class="mt-2">
+                                <span class="trigger-tag">Operational data</span>
+                                <span class="trigger-tag">Process metrics</span>
+                                <span class="trigger-tag">Cost reports</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </article>
+
+                <!-- Financial Optimizer -->
+                <article class="col-lg-6 mb-4">
+                    <div class="agent-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="h5 fw-bold mb-1">Financial Optimizer</h3>
+                                <p class="text-muted mb-0">Financial Performance Analyst</p>
+                            </div>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <p class="mb-3" style="color: var(--color-text-secondary);">Calculates financial KPIs, analyzes margins and profitability, and evaluates economic performance</p>
+                        <div class="mb-3">
+                            <strong>Capabilities</strong>
+                            <ul class="capability-list mt-2">
+                                <li>KPI calculation (EBITDA, margins)</li>
+                                <li>Profitability analysis</li>
+                                <li>Revenue optimization</li>
+                                <li>Financial benchmarking</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Triggered By</strong>
+                            <div class="mt-2">
+                                <span class="trigger-tag">P&L statements</span>
+                                <span class="trigger-tag">Financial data</span>
+                                <span class="trigger-tag">Revenue reports</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- Features Grid -->
-    <section class="py-5 bg-light">
+    <!-- H3: Example Agent Recommendations -->
+    <section style="background: var(--color-bg);">
         <div class="container">
+            <h3 class="section-title text-center mb-3">Example Agent Recommendations</h3>
+            <p class="lead text-center mb-5" style="max-width: 900px; margin: 0 auto; color: var(--color-text-secondary);">
+                Based on your data, AstraMech generates customized agents for your specific challenges
+            </p>
+
             <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="d-flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-calculator fa-2x text-primary"></i>
+                <!-- Revenue Optimizer -->
+                <article class="col-lg-4 mb-4">
+                    <div class="recommendation-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="h5 fw-bold mb-0">Revenue Optimizer</h4>
+                            <span class="impact-badge impact-high">High Impact</span>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5>KPI Analysis</h5>
-                            <p class="text-muted">Comprehensive financial, HR, and operational KPI calculations with industry benchmarks.</p>
+                        <p class="text-muted mb-3">Sales & Marketing Analyst</p>
+                        <div class="mb-3">
+                            <strong>Goal</strong>
+                            <p class="mb-0" style="color: var(--color-text-secondary);">Increase revenue growth to 4.6% by identifying high-value opportunities</p>
                         </div>
+                        <div class="mb-3">
+                            <strong>Strategy</strong>
+                            <p class="mb-0" style="color: var(--color-text-secondary);">Analyze sales pipeline, optimize pricing, and identify cross-sell opportunities</p>
+                        </div>
+                        <button class="btn btn-primary w-100">
+                            <i class="fas fa-bolt me-2"></i>Deploy Agent
+                        </button>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="d-flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-search fa-2x text-primary"></i>
+                </article>
+
+                <!-- Workforce Efficiency Agent -->
+                <article class="col-lg-4 mb-4">
+                    <div class="recommendation-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="h5 fw-bold mb-0">Workforce Efficiency Agent</h4>
+                            <span class="impact-badge impact-critical">Critical Impact</span>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5>Inefficiency Detection</h5>
-                            <p class="text-muted">AI-powered identification of performance bottlenecks and optimization opportunities.</p>
+                        <p class="text-muted mb-3">HR & Operations Specialist</p>
+                        <div class="mb-3">
+                            <strong>Goal</strong>
+                            <p class="mb-0" style="color: var(--color-text-secondary);">Boost employee utilization to 75% through workload optimization</p>
                         </div>
+                        <div class="mb-3">
+                            <strong>Strategy</strong>
+                            <p class="mb-0" style="color: var(--color-text-secondary);">Balance workloads, identify skill gaps, and recommend training programs</p>
+                        </div>
+                        <button class="btn btn-primary w-100">
+                            <i class="fas fa-bolt me-2"></i>Deploy Agent
+                        </button>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="d-flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-robot fa-2x text-primary"></i>
+                </article>
+
+                <!-- Customer Retention Specialist -->
+                <article class="col-lg-4 mb-4">
+                    <div class="recommendation-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="h5 fw-bold mb-0">Customer Retention Specialist</h4>
+                            <span class="impact-badge impact-high">High Impact</span>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5>Multi-Agent Analysis</h5>
-                            <p class="text-muted">Specialized AI agents for HR, Operations, and Financial optimization.</p>
+                        <p class="text-muted mb-3">Support & Success Manager</p>
+                        <div class="mb-3">
+                            <strong>Goal</strong>
+                            <p class="mb-0" style="color: var(--color-text-secondary);">Reduce customer churn by 10% through proactive engagement</p>
                         </div>
+                        <div class="mb-3">
+                            <strong>Strategy</strong>
+                            <p class="mb-0" style="color: var(--color-text-secondary);">Identify at-risk customers, personalize outreach, and improve support quality</p>
+                        </div>
+                        <button class="btn btn-primary w-100">
+                            <i class="fas fa-bolt me-2"></i>Deploy Agent
+                        </button>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="d-flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-memory fa-2x text-primary"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h5>Memory System</h5>
-                            <p class="text-muted">Persistent memory to track improvements and provide historical context.</p>
-                        </div>
-                    </div>
-                </div>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-5">
-        <div class="container text-center">
-            <h2 class="display-6 fw-bold mb-4">Ready to Optimize Your Business?</h2>
-            <p class="lead mb-4">Get started with our comprehensive efficiency analysis in just a few minutes.</p>
-            <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-rocket me-2"></i>Start Your Analysis
-            </a>
+    <!-- About Section -->
+    <section id="about" style="background: var(--color-bg);">
+        <div class="container">
+            <h5 class="section-title text-center mb-4">About</h5>
+            <p class="lead text-center mb-5" style="max-width: 900px; margin: 0 auto; color: var(--color-text-secondary);">
+                AstraMech · AI-powered business optimization for every department. Multi-agent system built with CrewAI, Ollama, and Pinecone to transform organizational performance.
+            </p>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2024 Company Efficiency Optimizer. Powered by AI.</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

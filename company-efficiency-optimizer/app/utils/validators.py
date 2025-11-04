@@ -8,10 +8,15 @@ from app.utils.errors import ValidationError
 
 def validate_questionnaire_data(data: dict) -> dict:
     """Validates questionnaire data."""
-    required_fields = ['company_name', 'industry', 'company_size', 'revenue_range', 'employee_count', 'analysis_focus']
+    # Required fields (simplified form - 4-5 key questions)
+    required_fields = ['company_name', 'industry', 'company_size', 'employee_count', 'analysis_focus']
     for field in required_fields:
         if not data.get(field):
             raise ValidationError(f"Missing required field: {field.replace('_', ' ').title()}")
+    
+    # Optional fields (for backward compatibility)
+    if 'revenue_range' not in data:
+        data['revenue_range'] = None  # Make it optional
     
     if not isinstance(data['analysis_focus'], list) or not data['analysis_focus']:
         raise ValidationError("At least one analysis focus area must be selected.")
@@ -20,7 +25,7 @@ def validate_questionnaire_data(data: dict) -> dict:
         employee_count = int(data['employee_count'])
         if employee_count <= 0:
             raise ValidationError("Employee count must be a positive number.")
-    except ValueError:
+    except (ValueError, TypeError):
         raise ValidationError("Employee count must be a valid number.")
     
     return data
