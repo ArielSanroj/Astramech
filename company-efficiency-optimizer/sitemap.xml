@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>{{ request.url_root|trim('/') }}/</loc></url>
+  <url><loc>{{ request.url_root|trim('/') }}{{ url_for('main.questionnaire') }}</loc></url>
+  <url><loc>{{ request.url_root|trim('/') }}{{ url_for('main.upload') }}</loc></url>
+  <url><loc>{{ request.url_root|trim('/') }}{{ url_for('main.results') }}</loc></url>
+  <url><loc>{{ request.url_root|trim('/') }}{{ url_for('robots') }}</loc></url>
+</urlset>
+

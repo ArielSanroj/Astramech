@@ -146,7 +146,7 @@ class KPICalculator:
             return 'medium'
         return 'low'
 
-    def _normalize_snapshot(self, record: Dict[str, Any] | None, keys: Tuple[str, ...]) -> Dict[str, float]:
+    def _normalize_snapshot(self, record: Optional[Dict[str, Any]], keys: Tuple[str, ...]) -> Dict[str, float]:
         if not isinstance(record, dict):
             return {}
         normalized: Dict[str, float] = {}
@@ -197,7 +197,7 @@ class KPICalculator:
         net_income = _to_number(financial_data.get('net_income'))
 
         hr_total_employees = None
-        hr_turnover_rate = 0.0
+        hr_turnover_rate = None
         hr_df = None
 
         if isinstance(hr_input, dict):
@@ -228,7 +228,7 @@ class KPICalculator:
                 turnover_pct = self._calculate_turnover_rate(hr_df)
                 hr_turnover_rate = turnover_pct / 100.0
 
-        if hr_turnover_rate > 1.0:
+        if hr_turnover_rate is not None and hr_turnover_rate > 1.0:
             hr_turnover_rate = hr_turnover_rate / 100.0
         hr_total_employees = int(hr_total_employees) if hr_total_employees not in (None, '') else 0
 
@@ -248,7 +248,7 @@ class KPICalculator:
         operating_margin_ratio = (operating_income / revenue) if revenue else 0.0
         net_margin_ratio = (net_income / revenue) if revenue else 0.0
 
-        cost_efficiency_ratio = 1.0 - (operating_expenses / revenue) if revenue else 0.0
+        cost_efficiency_ratio = 1.0 - (operating_expenses / revenue) if revenue else None
         process_efficiency = _to_number(operational_input.get('process_efficiency'))
         if process_efficiency:
             cost_efficiency_ratio = max(cost_efficiency_ratio, process_efficiency)
@@ -257,7 +257,7 @@ class KPICalculator:
         rev_emp_benchmark = self.benchmarks['revenue_per_employee'].get(
             industry_key, self.benchmarks['revenue_per_employee'].get('services', 300000)
         )
-        productivity_index = (revenue_per_employee / rev_emp_benchmark) if rev_emp_benchmark else 0.0
+        productivity_index = (revenue_per_employee / rev_emp_benchmark) if (rev_emp_benchmark and employee_count) else None
 
         financial_metric_input = {
             'revenue': revenue,
@@ -280,7 +280,7 @@ class KPICalculator:
         operational_kpis = self.calculate_operational_kpis(
             operational_input_for_calc,
             hr_df if hr_df is not None else pd.DataFrame()
-        ) if revenue else []
+        ) if (revenue and operating_expenses) else []
 
         inefficiencies = self.identify_inefficiencies(financial_kpis + hr_kpis + operational_kpis)
 
@@ -305,8 +305,43 @@ class KPICalculator:
         }
 
         hr_benchmark = self.benchmarks['turnover_rate'].get(industry_key, 0.0) / 100.0
-        if hr_turnover_rate == 0.0 and hr_benchmark:
-            hr_turnover_rate = hr_benchmark
+
+        # Compute weighted efficiency score using only available KPIs
+        weights = {
+            'gross_margin': 0.30,
+            'operating_margin': 0.25,
+            'net_margin': 0.20,
+            'turnover_rate': 0.10,  # lower is better
+            'productivity_index': 0.15  # relative to benchmark
+        }
+
+        available_weights = 0.0
+        score_accum = 0.0
+
+        if revenue:
+            if gross_margin_ratio is not None:
+                available_weights += weights['gross_margin']
+                score_accum += weights['gross_margin'] * min(1.0, max(0.0, gross_margin_ratio))
+            if operating_margin_ratio is not None:
+                available_weights += weights['operating_margin']
+                score_accum += weights['operating_margin'] * min(1.0, max(0.0, operating_margin_ratio))
+            if net_margin_ratio is not None:
+                available_weights += weights['net_margin']
+                score_accum += weights['net_margin'] * min(1.0, max(0.0, net_margin_ratio))
+
+        if hr_turnover_rate is not None:
+            available_weights += weights['turnover_rate']
+            # invert: lower turnover → higher score
+            inv = 1.0 - min(1.0, max(0.0, hr_turnover_rate))
+            score_accum += weights['turnover_rate'] * inv
+
+        if productivity_index is not None:
+            available_weights += weights['productivity_index']
+            score_accum += weights['productivity_index'] * min(1.0, max(0.0, productivity_index))
+
+        efficiency_score = None
+        if available_weights > 0:
+            efficiency_score = round((score_accum / available_weights) * 100)
 
         return {
             'financial': {
@@ -327,6 +362,7 @@ class KPICalculator:
                 'customer_satisfaction': _to_number(operational_input.get('customer_satisfaction')),
                 'projects_completed': int(_to_number(operational_input.get('projects_completed'))) if operational_input.get('projects_completed') is not None else None
             },
+            'efficiency_score': efficiency_score,
             'inefficiencies': cleaned_inefficiencies,
             'raw_kpis': {
                 'financial': [_clean_dict(kpi) for kpi in financial_kpis],
@@ -774,21 +810,28 @@ class KPICalculator:
             # Calculate department-specific KPIs
             department_kpis = self.calculate_department_kpis(sample_data, department.lower())
             
-            # Structure results with improved accuracy
+            # Structure results (no fabricated defaults)
+            gm = self._extract_kpi_value(financial_kpis, 'Gross Margin')
+            om = self._extract_kpi_value(financial_kpis, 'Operating Margin')
+            nm = self._extract_kpi_value(financial_kpis, 'Net Margin')
+            rpe = self._extract_kpi_value(financial_kpis, 'Revenue per Employee')
+            tr = self._extract_kpi_value(hr_kpis, 'Turnover Rate')
+            cer = self._extract_kpi_value(operational_kpis, 'Cost Efficiency Ratio')
+
             results = {
                 'financial': {
-                    'gross_margin': self._extract_kpi_value(financial_kpis, 'Gross Margin') / 100 if self._extract_kpi_value(financial_kpis, 'Gross Margin') else 0.3,
-                    'operating_margin': self._extract_kpi_value(financial_kpis, 'Operating Margin') / 100 if self._extract_kpi_value(financial_kpis, 'Operating Margin') else 0.15,
-                    'net_margin': self._extract_kpi_value(financial_kpis, 'Net Margin') / 100 if self._extract_kpi_value(financial_kpis, 'Net Margin') else 0.1,
-                    'revenue_per_employee': self._extract_kpi_value(financial_kpis, 'Revenue per Employee') if self._extract_kpi_value(financial_kpis, 'Revenue per Employee') else 250000
+                    'gross_margin': (gm / 100.0) if gm else None,
+                    'operating_margin': (om / 100.0) if om else None,
+                    'net_margin': (nm / 100.0) if nm else None,
+                    'revenue_per_employee': rpe if rpe else None
                 },
                 'hr': {
-                    'turnover_rate': self._extract_kpi_value(hr_kpis, 'Turnover Rate') / 100 if self._extract_kpi_value(hr_kpis, 'Turnover Rate') else 0.15,
-                    'total_employees': hr_data.get('total_employees', 50)
+                    'turnover_rate': (tr / 100.0) if tr else None,
+                    'total_employees': hr_data.get('total_employees') if hr_data else None
                 },
                 'operational': {
-                    'cost_efficiency_ratio': self._extract_kpi_value(operational_kpis, 'Cost Efficiency Ratio') / 100 if self._extract_kpi_value(operational_kpis, 'Cost Efficiency Ratio') else 0.8,
-                    'productivity_index': operational_data.get('process_efficiency', 0.78)
+                    'cost_efficiency_ratio': (cer / 100.0) if cer else None,
+                    'productivity_index': None
                 },
                 'department': {
                     'name': department,
@@ -808,21 +851,21 @@ class KPICalculator:
             print(f"❌ Error calculating all KPIs: {str(e)}")
             import traceback
             traceback.print_exc()
-            # Return default values on error
+            # Return mostly empty values on error (no fabricated numbers)
             return {
                 'financial': {
-                    'gross_margin': 0.3,
-                    'operating_margin': 0.15,
-                    'net_margin': 0.1,
-                    'revenue_per_employee': 250000
+                    'gross_margin': None,
+                    'operating_margin': None,
+                    'net_margin': None,
+                    'revenue_per_employee': None
                 },
                 'hr': {
-                    'turnover_rate': 0.15,
-                    'total_employees': 50
+                    'turnover_rate': None,
+                    'total_employees': None
                 },
                 'operational': {
-                    'cost_efficiency_ratio': 0.8,
-                    'productivity_index': 0.78
+                    'cost_efficiency_ratio': None,
+                    'productivity_index': None
                 },
                 'department': {
                     'name': department,

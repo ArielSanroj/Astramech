@@ -24,10 +24,10 @@ def process_questionnaire():
             'company_name': request.form.get('company_name'),
             'industry': request.form.get('industry'),
             'company_size': request.form.get('company_size'),
-            'revenue_range': request.form.get('revenue_range'),
+            'revenue_range': request.form.get('revenue_range'),  # Optional (for backward compatibility)
             'employee_count': request.form.get('employee_count'),
-            'current_challenges': request.form.get('current_challenges'),
-            'goals': request.form.get('goals'),
+            'current_challenges': request.form.get('current_challenges', ''),  # Optional
+            'goals': request.form.get('goals', ''),  # Optional
             'analysis_focus': request.form.getlist('analysis_focus')
         }
         
@@ -100,12 +100,12 @@ def process_upload():
             flash('No questionnaire data found. Please complete the questionnaire first.', 'error')
             return redirect(url_for('main.questionnaire'))
         
-        # Run analysis
-        analysis_service = AnalysisService()
-        analysis_results = analysis_service.run_analysis(questionnaire_data, processed_data)
-        session['analysis_results'] = analysis_results
+        # Store file data in session for processing
+        session['file_data'] = processed_data
+        session['files_uploaded'] = True
         
-        return redirect(url_for('main.results'))
+        # Redirect to processing page
+        return redirect(url_for('main.processing'))
     
     except RequestEntityTooLarge:
         flash('File size exceeds maximum allowed size', 'error')

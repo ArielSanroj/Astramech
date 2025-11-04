@@ -20,6 +20,7 @@ import pdf2image
 from io import BytesIO
 import csv
 import re
+import json
 
 load_dotenv()
 
@@ -57,7 +58,7 @@ class EnhancedDataIngestion:
                 r'UTILIDAD OPERACIONAL'
             ],
             'net_income': [
-                r'RESULTADO DEL EJERCICIO.*UTILIDAD',
+                r'RESULTADO DEL EJERCICIO',
                 r'UTILIDAD NETA',
                 r'GANANCIA NETA'
             ]
@@ -138,6 +139,38 @@ class EnhancedDataIngestion:
             financial_data['employee_count'] = self._estimate_employee_count_improved(financial_data)
             print(f"👥 Estimated employee count: {financial_data['employee_count']}")
             
+            # Fallback: if core metrics missing, try generalized LLM parsing
+            if not financial_data.get('revenue') and not financial_data.get('operating_income'):
+                try:
+                    document_text = self._excel_to_text(file_path)
+                    llm_parsed = self.generalized_parse_excel(document_text)
+                    if isinstance(llm_parsed, dict) and llm_parsed:
+                        # Map into our keys
+                        mapped = {
+                            'revenue': llm_parsed.get('revenue'),
+                            'cogs': llm_parsed.get('cogs'),
+                            'operating_expenses': llm_parsed.get('opex'),
+                            'operating_income': llm_parsed.get('operating_income'),
+                            'net_income': llm_parsed.get('net_income'),
+                            'total_assets': llm_parsed.get('total_assets'),
+                            'cash_and_equivalents': llm_parsed.get('cash'),
+                            'investments': llm_parsed.get('investments'),
+                            'fixed_assets': llm_parsed.get('fixed_assets'),
+                            'total_liabilities': llm_parsed.get('liabilities'),
+                            'total_equity': llm_parsed.get('equity'),
+                        }
+                        for k, v in mapped.items():
+                            if v not in (None, "N/A", ""):
+                                financial_data[k] = v
+                        if llm_parsed.get('estimated_employees') not in (None, "N/A", ""):
+                            financial_data['employee_count'] = int(float(llm_parsed.get('estimated_employees')))
+                        if llm_parsed.get('currency'):
+                            financial_data['currency'] = llm_parsed.get('currency')
+                        if llm_parsed.get('period'):
+                            financial_data['period'] = llm_parsed.get('period')
+                except Exception as _:
+                    pass
+
             # Validate currency and data consistency
             self._validate_financial_data(financial_data)
             
@@ -148,6 +181,48 @@ class EnhancedDataIngestion:
             import traceback
             traceback.print_exc()
             return {}
+
+    def _excel_to_text(self, file_path: str) -> str:
+        """Convert all Excel sheets to a plain text representation for LLM parsing."""
+        try:
+            xl = pd.ExcelFile(file_path)
+            parts: List[str] = []
+            for sheet in xl.sheet_names:
+                try:
+                    df = xl.parse(sheet)
+                    parts.append(f"SHEET: {sheet}\n{df.to_string(index=False)}\n")
+                except Exception:
+                    continue
+            return "\n".join(parts)
+        except Exception:
+            return ""
+
+    def generalized_parse_excel(self, document_text: str) -> Dict[str, Any]:
+        """LLM-assisted fallback parsing for arbitrary Excel layouts."""
+        if not document_text:
+            return {}
+        prompt = (
+            "Eres un experto en extracción de datos financieros de archivos Excel, independientemente del formato o idioma. "
+            "Analiza la descripción de un archivo Excel (texto con sheets y rows) y extrae un JSON SOLO con estas claves: "
+            "revenue, cogs, opex, operating_income, net_income, total_assets, cash, investments, fixed_assets, liabilities, equity, estimated_employees, currency, period. "
+            "Si un dato no aparece, usa \"N/A\". Usa COP como moneda por defecto.\n\n"
+            "Descripcion:\n" + document_text + "\n\nDevuelve solo JSON válido."
+        )
+        # Try to use ChatOllama if available
+        try:
+            from langchain_ollama import ChatOllama
+            llm = ChatOllama(model=os.getenv("OLLAMA_MODEL", "llama3.2:3b"), base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"), temperature=0.2)
+            response = llm.invoke(prompt)
+            text = response.content if hasattr(response, 'content') else str(response)
+            # Extract JSON
+            first_brace = text.find('{')
+            last_brace = text.rfind('}')
+            if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
+                payload = text[first_brace:last_brace+1]
+                return json.loads(payload)
+        except Exception:
+            pass
+        return {}
     
     def _classify_sheet(self, sheet_name: str, df: pd.DataFrame) -> str:
         """Classify the type of financial sheet"""
@@ -181,19 +256,30 @@ class EnhancedDataIngestion:
         pl_data = {}
         
         try:
+            def rightmost_numeric(series: pd.Series) -> float:
+                # Prefer explicit 'Total' column if present
+                for col in series.index[::-1]:
+                    try:
+                        val = series[col]
+                        if pd.isna(val):
+                            continue
+                        # Skip first label-like column
+                        if series.index.get_loc(col) == 0:
+                            continue
+                        num = float(str(val).replace(',', '').replace(' ', ''))
+                        return num
+                    except Exception:
+                        continue
+                return 0.0
+
             # Process each row to find financial figures
             for index, row in df.iterrows():
                 if pd.isna(row.iloc[0]):
                     continue
                 
                 account_name = str(row.iloc[0]).strip()
-                total_value = 0
-                
-                # Get the total value from the last column
-                try:
-                    if not pd.isna(row.iloc[-1]):
-                        total_value = float(row.iloc[-1])
-                except:
+                total_value = rightmost_numeric(row)
+                if total_value == 0:
                     continue
                 
                 # Match against Colombian accounting patterns

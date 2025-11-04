@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block title %}AstraMech - Analyzing Your Data{% endblock %}
+{% block meta_description %}AI agents are analyzing your company data to identify inefficiencies and generate recommendations.{% endblock %}
+{% block content %}
+    <style>
+        .processing-container {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .agent-animation {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .agent-card-processing {
+            background: var(--color-surface);
+            border: 1px solid rgba(123, 97, 255, 0.2);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            min-width: 150px;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        
+        .agent-card-processing:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        
+        .agent-card-processing:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        
+        .agent-card-processing.active {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 20px rgba(123, 97, 255, 0.3);
+        }
+        
+        .progress-steps {
+            margin: 2rem 0;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+            border-left: 3px solid transparent;
+        }
+        
+        .step-item.active {
+            border-left-color: var(--color-primary);
+            background: var(--color-surface-alt);
+        }
+        
+        .step-item.completed {
+            border-left-color: var(--color-secondary);
+        }
+        
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            background: var(--color-surface-alt);
+        }
+        
+        .step-item.active .step-icon {
+            background: var(--color-primary-gradient);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .step-item.completed .step-icon {
+            background: var(--color-secondary);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+        
+        .spinner {
+            border: 3px solid rgba(123, 97, 255, 0.1);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    <div class="processing-container">
+        <div class="container">
+            <!-- Progress Bar -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="mb-0">Analyzing Your Data</h2>
+                    <span class="text-muted">Step 3 of 3</span>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Main Message -->
+            <div class="mb-5">
+                <div class="spinner mb-4"></div>
+                <h3 class="mb-3">AI Agents are Working</h3>
+                <p class="lead text-muted" style="max-width: 600px; margin: 0 auto;">
+                    Our specialized AI agents are analyzing your data, calculating KPIs, and identifying inefficiencies. This usually takes 30-60 seconds.
+                </p>
+            </div>
+
+            <!-- Agent Animation -->
+            <div class="agent-animation">
+                <div class="agent-card-processing" id="agent1">
+                    <i class="fas fa-robot fa-2x mb-2" style="color: var(--color-primary);"></i>
+                    <div class="small">Diagnostic Agent</div>
+                    <div class="small text-muted">Active</div>
+                </div>
+                <div class="agent-card-processing" id="agent2">
+                    <i class="fas fa-chart-line fa-2x mb-2" style="color: var(--color-secondary);"></i>
+                    <div class="small">KPI Calculator</div>
+                    <div class="small text-muted">Processing</div>
+                </div>
+                <div class="agent-card-processing" id="agent3">
+                    <i class="fas fa-lightbulb fa-2x mb-2" style="color: var(--color-highlight);"></i>
+                    <div class="small">Analysis Engine</div>
+                    <div class="small text-muted">Analyzing</div>
+                </div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step-item completed" id="step1">
+                    <div class="step-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="flex-grow-1 text-start">
+                        <strong>Data Uploaded</strong>
+                        <div class="text-muted small">Files processed and validated</div>
+                    </div>
+                </div>
+                
+                <div class="step-item active" id="step2">
+                    <div class="step-icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <div class="flex-grow-1 text-start">
+                        <strong>Calculating KPIs</strong>
+                        <div class="text-muted small">Analyzing financial, HR, and operational metrics</div>
+                    </div>
+                </div>
+                
+                <div class="step-item" id="step3">
+                    <div class="step-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="flex-grow-1 text-start">
+                        <strong>AI Analysis</strong>
+                        <div class="text-muted small">Identifying inefficiencies and generating recommendations</div>
+                    </div>
+                </div>
+                
+                <div class="step-item" id="step4">
+                    <div class="step-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="flex-grow-1 text-start">
+                        <strong>Generating Report</strong>
+                        <div class="text-muted small">Preparing your personalized dashboard</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate progress steps
+        let currentStep = 2;
+        const steps = [
+            { id: 'step1', delay: 0 },
+            { id: 'step2', delay: 2000 },
+            { id: 'step3', delay: 5000 },
+            { id: 'step4', delay: 8000 }
+        ];
+
+        steps.forEach((step, index) => {
+            setTimeout(() => {
+                const stepEl = document.getElementById(step.id);
+                if (stepEl) {
+                    // Mark previous as completed
+                    if (index > 0) {
+                        const prevStep = document.getElementById(steps[index - 1].id);
+                        if (prevStep) {
+                            prevStep.classList.remove('active');
+                            prevStep.classList.add('completed');
+                            const prevIcon = prevStep.querySelector('.step-icon');
+                            if (prevIcon) {
+                                prevIcon.innerHTML = '<i class="fas fa-check"></i>';
+                            }
+                        }
+                    }
+                    
+                    // Mark current as active
+                    stepEl.classList.add('active');
+                    stepEl.classList.remove('completed');
+                    const icon = stepEl.querySelector('.step-icon');
+                    if (icon) {
+                        icon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    }
+                }
+            }, step.delay);
+        });
+
+        // Check for results every 2 seconds
+        let checkCount = 0;
+        const maxChecks = 60; // 2 minutes max
+        
+        function checkResults() {
+            checkCount++;
+            if (checkCount > maxChecks) {
+                window.location.href = "{{ url_for('main.results') }}";
+                return;
+            }
+            
+            // Check if analysis is complete by checking session via API endpoint
+            fetch("{{ url_for('main.processing') }}", { 
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    // Simple check - if results page is accessible, redirect
+                    fetch("{{ url_for('main.results') }}", { method: 'HEAD' })
+                        .then(response => {
+                            if (response.ok || checkCount > 10) {
+                                // Results are ready or enough time has passed, redirect
+                                setTimeout(() => {
+                                    window.location.href = "{{ url_for('main.results') }}";
+                                }, 1000);
+                            } else {
+                                // Continue checking
+                                setTimeout(checkResults, 2000);
+                            }
+                        })
+                        .catch(() => {
+                            // Continue checking
+                            setTimeout(checkResults, 2000);
+                        });
+                })
+                .catch(() => {
+                    // Continue checking
+                    setTimeout(checkResults, 2000);
+                });
+        }
+
+        // Start checking after initial delay
+        setTimeout(checkResults, 3000);
+    </script>
+{% endblock %}
+
