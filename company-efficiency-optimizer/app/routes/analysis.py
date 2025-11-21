@@ -11,10 +11,12 @@ import logging
 from app.services.analysis_service import AnalysisService
 from app.utils.validators import validate_questionnaire_data, validate_file_upload
 from app.utils.errors import ValidationError, FileProcessingError
+from data_ingest import EnhancedDataIngestion
 
 logger = logging.getLogger(__name__)
 
 analysis_bp = Blueprint('analysis', __name__)
+data_ingestion = EnhancedDataIngestion()
 
 @analysis_bp.route('/process_questionnaire', methods=['POST'])
 def process_questionnaire():
@@ -57,10 +59,18 @@ def process_upload():
         if not files or all(file.filename == '' for file in files):
             flash('No files selected', 'error')
             return redirect(url_for('main.upload'))
+
+        questionnaire_data = session.get('questionnaire_data', {})
+        if not questionnaire_data:
+            flash('No questionnaire data found. Please complete the questionnaire first.', 'error')
+            return redirect(url_for('main.questionnaire'))
         
         # Process files
         processed_data = {}
-        upload_folder = os.getenv('UPLOAD_FOLDER', 'uploads')
+        # Use /tmp/uploads in Vercel, 'uploads' locally
+        upload_folder = os.getenv('UPLOAD_FOLDER', '/tmp/uploads' if os.path.exists('/tmp') else 'uploads')
+        # Ensure upload folder exists
+        os.makedirs(upload_folder, exist_ok=True)
         max_file_size = int(os.getenv('MAX_FILE_SIZE', 16 * 1024 * 1024))
         allowed_extensions = {'pdf', 'xlsx', 'xls', 'csv'}
         
@@ -75,15 +85,24 @@ def process_upload():
                     filename = secure_filename(validated_file.filename)
                     filepath = os.path.join(upload_folder, filename)
                     validated_file.save(filepath)
-                    
+                    _, ext = os.path.splitext(filename.lower())
+
                     # Process file based on type
-                    if filename.lower().endswith(('.xlsx', '.xls')):
-                        df = pd.read_excel(filepath)
-                        processed_data[filename] = df.to_dict('records')
-                    elif filename.lower().endswith('.csv'):
+                    if ext in ('.xlsx', '.xls'):
+                        structured_data = data_ingestion.process_excel_file(
+                            filepath,
+                            company_name=questionnaire_data.get('company_name'),
+                            department='Finance'
+                        )
+                        if structured_data:
+                            processed_data[filename] = structured_data
+                        else:
+                            df = pd.read_excel(filepath)
+                            processed_data[filename] = df.to_dict('records')
+                    elif ext == '.csv':
                         df = pd.read_csv(filepath)
                         processed_data[filename] = df.to_dict('records')
-                    elif filename.lower().endswith('.pdf'):
+                    elif ext == '.pdf':
                         processed_data[filename] = "PDF processed"
                         
                 except ValidationError as e:
@@ -93,12 +112,6 @@ def process_upload():
                     logger.error(f"Error processing file {file.filename}: {str(e)}")
                     flash(f'Error processing file {file.filename}: {str(e)}', 'error')
                     return redirect(url_for('main.upload'))
-        
-        # Get questionnaire data
-        questionnaire_data = session.get('questionnaire_data', {})
-        if not questionnaire_data:
-            flash('No questionnaire data found. Please complete the questionnaire first.', 'error')
-            return redirect(url_for('main.questionnaire'))
         
         # Store file data in session for processing
         session['file_data'] = processed_data

@@ -1,0 +1,23 @@
+{
+  "name": "astramech",
+  "version": "1.0.0",
+  "description": "AstraMech - AI-Powered Business Optimization Platform",
+  "scripts": {
+    "dev": "python3 run.py",
+    "start": "python3 run.py"
+  },
+  "engines": {
+    "python": "3.9.x"
+  },
+  "keywords": [
+    "flask",
+    "ai",
+    "business-optimization",
+    "kpi",
+    "crewai"
+  ],
+  "author": "",
+  "license": "MIT"
+}
+
+

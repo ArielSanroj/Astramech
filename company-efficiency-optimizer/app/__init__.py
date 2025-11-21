@@ -24,17 +24,31 @@ def create_app(config_name=None):
     app.config.from_object(config[config_name])
     
     # Configure logging
-    if not app.debug and not app.testing:
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        file_handler = logging.FileHandler('logs/app.log')
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-        ))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
+    # In Vercel/production, use console logging instead of file logging
+    if app.debug or app.testing:
+        app.logger.setLevel(logging.DEBUG)
+    else:
         app.logger.setLevel(logging.INFO)
-        app.logger.info('Company Efficiency Optimizer startup')
+        # Only add file handler if logs directory is writable (not in Vercel)
+        try:
+            log_dir = os.path.dirname(app.config.get('LOG_FILE', 'logs/app.log'))
+            if log_dir and os.path.exists(log_dir) and os.access(log_dir, os.W_OK):
+                file_handler = logging.FileHandler(app.config.get('LOG_FILE', 'logs/app.log'))
+                file_handler.setFormatter(logging.Formatter(
+                    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+                ))
+                file_handler.setLevel(logging.INFO)
+                app.logger.addHandler(file_handler)
+        except (OSError, IOError):
+            # In Vercel/serverless, file logging may not be available
+            # Use console logging instead
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s'
+            ))
+            app.logger.addHandler(console_handler)
+    
+    app.logger.info('Company Efficiency Optimizer startup')
     
     # Initialize extensions
     Session(app)

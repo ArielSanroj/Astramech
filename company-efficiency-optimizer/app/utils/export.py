@@ -9,6 +9,24 @@ from io import StringIO
 from datetime import datetime
 
 
+def _safe_format_percent(value: Any, default: str = 'N/A') -> str:
+    """Safely format a percentage value, handling None"""
+    if value is None:
+        return default
+    try:
+        return f"{float(value) * 100:.1f}"
+    except (TypeError, ValueError):
+        return default
+
+def _safe_format_number(value: Any, default: str = 'N/A') -> str:
+    """Safely format a number value, handling None"""
+    if value is None:
+        return default
+    try:
+        return f"{float(value):,.0f}"
+    except (TypeError, ValueError):
+        return default
+
 def export_results_to_csv(results: Dict[str, Any]) -> str:
     """
     Export analysis results to CSV format
@@ -35,26 +53,31 @@ def export_results_to_csv(results: Dict[str, Any]) -> str:
         writer.writerow(['FINANCIAL KPIs'])
         writer.writerow(['Metric', 'Value', 'Unit'])
         if 'financial' in kpis:
-            writer.writerow(['Gross Margin', f"{kpis['financial'].get('gross_margin', 0) * 100:.1f}", '%'])
-            writer.writerow(['Operating Margin', f"{kpis['financial'].get('operating_margin', 0) * 100:.1f}", '%'])
-            writer.writerow(['Net Margin', f"{kpis['financial'].get('net_margin', 0) * 100:.1f}", '%'])
-            writer.writerow(['Revenue per Employee', f"${kpis['financial'].get('revenue_per_employee', 0):,.0f}", 'USD'])
+            financial = kpis['financial']
+            writer.writerow(['Gross Margin', _safe_format_percent(financial.get('gross_margin')), '%'])
+            writer.writerow(['Operating Margin', _safe_format_percent(financial.get('operating_margin')), '%'])
+            writer.writerow(['Net Margin', _safe_format_percent(financial.get('net_margin')), '%'])
+            rev_per_emp = financial.get('revenue_per_employee')
+            writer.writerow(['Revenue per Employee', f"${_safe_format_number(rev_per_emp)}" if rev_per_emp is not None else 'N/A', 'COP'])
         writer.writerow([])
         
         # HR KPIs
         writer.writerow(['HR KPIs'])
         writer.writerow(['Metric', 'Value', 'Unit'])
         if 'hr' in kpis:
-            writer.writerow(['Turnover Rate', f"{kpis['hr'].get('turnover_rate', 0) * 100:.1f}", '%'])
-            writer.writerow(['Total Employees', f"{kpis['hr'].get('total_employees', 0)}", 'count'])
+            hr = kpis['hr']
+            writer.writerow(['Turnover Rate', _safe_format_percent(hr.get('turnover_rate')), '%'])
+            total_emp = hr.get('total_employees')
+            writer.writerow(['Total Employees', str(total_emp) if total_emp is not None else 'N/A', 'count'])
         writer.writerow([])
         
         # Operational KPIs
         writer.writerow(['OPERATIONAL KPIs'])
         writer.writerow(['Metric', 'Value', 'Unit'])
         if 'operational' in kpis:
-            writer.writerow(['Cost Efficiency Ratio', f"{kpis['operational'].get('cost_efficiency_ratio', 0) * 100:.1f}", '%'])
-            writer.writerow(['Productivity Index', f"{kpis['operational'].get('productivity_index', 0) * 100:.1f}", '%'])
+            operational = kpis['operational']
+            writer.writerow(['Cost Efficiency Ratio', _safe_format_percent(operational.get('cost_efficiency_ratio')), '%'])
+            writer.writerow(['Productivity Index', _safe_format_percent(operational.get('productivity_index')), '%'])
         writer.writerow([])
     
     # Recommendations
