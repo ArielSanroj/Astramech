@@ -32,7 +32,7 @@ if __name__ == '__main__':
     print(f"   Max file size: {app.config.get('MAX_FILE_SIZE', 16 * 1024 * 1024) / (1024 * 1024):.1f}MB")
     
     # Allow overriding port via environment variables
-    port = int(os.getenv('PORT', os.getenv('FLASK_RUN_PORT', 5001)))
+    port = int(os.getenv('PORT', os.getenv('FLASK_RUN_PORT', 5002)))
     app.run(
         host='0.0.0.0',
         port=port,

@@ -8,8 +8,8 @@ from app.utils.errors import ValidationError
 
 def validate_questionnaire_data(data: dict) -> dict:
     """Validates questionnaire data."""
-    # Required fields (simplified form - 4-5 key questions)
-    required_fields = ['company_name', 'industry', 'company_size', 'employee_count', 'analysis_focus']
+    # Required fields (simplified form - 3 key questions)
+    required_fields = ['company_name', 'industry', 'company_size']
     for field in required_fields:
         if not data.get(field):
             raise ValidationError(f"Missing required field: {field.replace('_', ' ').title()}")
@@ -18,15 +18,40 @@ def validate_questionnaire_data(data: dict) -> dict:
     if 'revenue_range' not in data:
         data['revenue_range'] = None  # Make it optional
     
-    if not isinstance(data['analysis_focus'], list) or not data['analysis_focus']:
-        raise ValidationError("At least one analysis focus area must be selected.")
+    # Make analysis_focus optional (default to all if not provided)
+    if 'analysis_focus' not in data or not data['analysis_focus']:
+        data['analysis_focus'] = ['all']
     
-    try:
-        employee_count = int(data['employee_count'])
-        if employee_count <= 0:
-            raise ValidationError("Employee count must be a positive number.")
-    except (ValueError, TypeError):
-        raise ValidationError("Employee count must be a valid number.")
+    # Derive employee_count from company_size if not provided
+    if not data.get('employee_count'):
+        company_size = data.get('company_size', '').lower()
+        size_to_count = {
+            'startup': 5,      # 1-10 employees, use midpoint
+            'small': 30,       # 11-50 employees, use midpoint
+            'medium': 125,     # 51-200 employees, use midpoint
+            'large': 600,      # 201-1000 employees, use midpoint
+            'enterprise': 2000 # 1000+ employees, use estimate
+        }
+        data['employee_count'] = size_to_count.get(company_size, 50)  # Default to 50 if unknown
+    
+    # Validate employee_count if provided
+    if data.get('employee_count'):
+        try:
+            employee_count = int(data['employee_count'])
+            if employee_count <= 0:
+                raise ValidationError("Employee count must be a positive number.")
+            data['employee_count'] = employee_count
+        except (ValueError, TypeError):
+            # If invalid, use default based on company_size
+            company_size = data.get('company_size', '').lower()
+            size_to_count = {
+                'startup': 5,
+                'small': 30,
+                'medium': 125,
+                'large': 600,
+                'enterprise': 2000
+            }
+            data['employee_count'] = size_to_count.get(company_size, 50)
     
     return data
 

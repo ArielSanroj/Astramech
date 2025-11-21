@@ -123,6 +123,9 @@
                         <div class="col-md-9">
                             <h4 class="mb-3">Executive Summary</h4>
                             <p class="mb-2">
+                                {% if results.summary_message %}
+                                {{ results.summary_message }}
+                                {% else %}
                                 <strong>{{ results.company_name }}</strong> analysis complete. 
                                 {% if results.kpi_results %}
                                 Detected inefficiencies in 
@@ -134,10 +137,17 @@
                                 <span class="status-badge-large status-warning">Operations</span>
                                 {% endif %}
                                 {% endif %}
+                                {% endif %}
                             </p>
+                            {% if results.agents and results.agents|length > 0 %}
+                            <p class="text-muted mb-0">
+                                <strong>{{ results.agents|length }} agentes AI especializados</strong> han sido generados para optimizar tu negocio. Revisa las recomendaciones abajo.
+                            </p>
+                            {% else %}
                             <p class="text-muted mb-0">
                                 AI agents have identified key areas for optimization and generated actionable recommendations below.
                             </p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -401,11 +411,335 @@
     </div>
     {% endif %}
     {% endif %}
+    
+    <!-- Next Steps Section -->
+    {% if results.kpi_results and results.kpi_results.inefficiencies %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card" style="background: var(--color-surface); border: 1px solid rgba(123, 97, 255, 0.2);">
+                <div class="card-header" style="background: var(--color-surface-alt);">
+                    <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Próximos Pasos Inmediatos</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Acciones prioritarias basadas en tu análisis. Empieza por estas para maximizar el impacto:</p>
+                    <div class="row">
+                        {% for ineff in results.kpi_results.inefficiencies[:5] %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100" style="background: var(--color-surface-alt); border-left: 4px solid {% if ineff.severity == 'critical' %}var(--color-danger){% elif ineff.severity == 'high' %}var(--color-highlight){% else %}var(--color-primary){% endif %};">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-{% if ineff.severity == 'critical' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                                            {{ ineff.issue_type|replace('_', ' ')|title }}
+                                        </h6>
+                                        <span class="badge {% if ineff.severity == 'critical' %}bg-danger{% elif ineff.severity == 'high' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                            {{ ineff.severity|upper if ineff.severity else 'MEDIA' }}
+                                        </span>
+                                    </div>
+                                    <p class="small mb-2">{{ ineff.description }}</p>
+                                    {% if ineff.recommended_agent %}
+                                    <p class="small text-primary mb-0">
+                                        <i class="fas fa-robot me-1"></i>Agente recomendado: <strong>{{ ineff.recommended_agent }}</strong>
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- AI Agents Section with Action Plan -->
+    {% if results.agents and results.agents|length > 0 %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card" style="background: var(--color-surface); border: 1px solid rgba(123, 97, 255, 0.2);">
+                <div class="card-header" style="background: var(--color-surface-alt);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Plan de Acción de 90 Días</h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="activateAllAgents()">
+                            <i class="fas fa-play me-1"></i>Activar Todos los Agentes
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Cada agente tiene tareas específicas y medibles. Marca las tareas completadas para hacer seguimiento de tu progreso.</p>
+                    <div class="row">
+                        {% for agent in results.agents %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100" style="background: var(--color-surface-alt); border-left: 4px solid {% if agent.priority == 'CRÍTICO' %}var(--color-danger){% elif agent.priority == 'Alta' %}var(--color-primary){% else %}var(--color-secondary){% endif %};">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-robot me-2" style="color: var(--color-primary);"></i>{{ agent.name }}
+                                            </h6>
+                                            <p class="text-muted small mb-0"><strong>Rol:</strong> {{ agent.role }}</p>
+                                        </div>
+                                        <span class="badge {% if agent.priority == 'CRÍTICO' %}bg-danger{% elif agent.priority == 'Alta' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                            {{ agent.priority }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <strong class="small">Objetivo (90 días):</strong>
+                                        <p class="small mb-0">{{ agent.goal }}</p>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <strong class="small">Tareas:</strong>
+                                            <span class="badge bg-secondary" id="progress-{{ loop.index0 }}">
+                                                0/{{ agent.tasks|length }} completadas
+                                            </span>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 6px;">
+                                            <div class="progress-bar" id="progress-bar-{{ loop.index0 }}" style="width: 0%"></div>
+                                        </div>
+                                        <div class="task-list">
+                                            {# Capture agent index before inner loop - Jinja2 doesn't support loop.parent #}
+                                            {% set agent_index = loop.index0 %}
+                                            {% for task in agent.tasks %}
+                                            <div class="form-check mb-2 task-item" data-agent-index="{{ agent_index }}" data-task-index="{{ loop.index0 }}">
+                                                <input class="form-check-input task-checkbox" type="checkbox" 
+                                                       id="task-{{ agent_index }}-{{ loop.index0 }}"
+                                                       onchange="updateTaskProgress({{ agent_index }}, {{ loop.index0 }}, this.checked)">
+                                                <label class="form-check-label small {% if false %}text-decoration-line-through text-muted{% endif %}" 
+                                                       for="task-{{ agent_index }}-{{ loop.index0 }}">
+                                                    {{ task }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3 pt-3 border-top">
+                                        <p class="mb-0 small">
+                                            <i class="fas fa-bullseye me-1 text-primary"></i>
+                                            <strong>Métrica de éxito:</strong> 
+                                            <span class="text-primary">{{ agent.success_metric }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Action Buttons Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card" style="background: var(--color-surface); border: 1px solid rgba(123, 97, 255, 0.2);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h6 class="mb-1">¿Qué quieres hacer ahora?</h6>
+                            <p class="text-muted small mb-0">Guarda este análisis o inicia uno nuevo</p>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary" onclick="saveAnalysis()">
+                                <i class="fas fa-save me-2"></i>Guardar Análisis
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="exportFullReport()">
+                                <i class="fas fa-file-pdf me-2"></i>Exportar Reporte Completo
+                            </button>
+                            <form method="POST" action="{{ url_for('main.clear_session') }}" style="display: inline;">
+                                <button type="submit" class="btn btn-primary" onclick="return confirm('¿Estás seguro de que quieres iniciar un nuevo análisis? Esto limpiará los datos actuales.');">
+                                    <i class="fas fa-plus me-2"></i>Nuevo Análisis
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+// Task tracking functionality
+let taskProgress = {};
+
+function initializeTaskProgress() {
+    // Initialize progress tracking for each agent
+    {% if results.agents %}
+    {% for agent in results.agents %}
+    taskProgress[{{ loop.index0 }}] = {
+        total: {{ agent.tasks|length }},
+        completed: 0,
+        tasks: {}
+    };
+    {% endfor %}
+    {% endif %}
+    
+    // Load saved progress from localStorage
+    const savedProgress = localStorage.getItem('astramech_task_progress');
+    if (savedProgress) {
+        try {
+            const parsed = JSON.parse(savedProgress);
+            Object.keys(parsed).forEach(agentIndex => {
+                if (taskProgress[agentIndex]) {
+                    taskProgress[agentIndex] = parsed[agentIndex];
+                    // Restore checkboxes
+                    Object.keys(parsed[agentIndex].tasks).forEach(taskIndex => {
+                        const checkbox = document.getElementById(`task-${agentIndex}-${taskIndex}`);
+                        if (checkbox && parsed[agentIndex].tasks[taskIndex]) {
+                            checkbox.checked = true;
+                            const label = checkbox.closest('.task-item').querySelector('label');
+                            if (label) {
+                                label.classList.add('text-decoration-line-through', 'text-muted');
+                            }
+                        }
+                    });
+                    updateProgressBar(parseInt(agentIndex));
+                }
+            });
+        } catch (e) {
+            console.error('Error loading saved progress:', e);
+        }
+    }
+}
+
+function updateTaskProgress(agentIndex, taskIndex, completed) {
+    if (!taskProgress[agentIndex]) {
+        taskProgress[agentIndex] = { total: 0, completed: 0, tasks: {} };
+    }
+    
+    taskProgress[agentIndex].tasks[taskIndex] = completed;
+    taskProgress[agentIndex].completed = Object.values(taskProgress[agentIndex].tasks).filter(t => t).length;
+    
+    // Update UI
+    const checkbox = document.getElementById(`task-${agentIndex}-${taskIndex}`);
+    if (checkbox) {
+        const label = checkbox.closest('.task-item').querySelector('label');
+        if (label) {
+            if (completed) {
+                label.classList.add('text-decoration-line-through', 'text-muted');
+            } else {
+                label.classList.remove('text-decoration-line-through', 'text-muted');
+            }
+        }
+    }
+    
+    updateProgressBar(agentIndex);
+    saveTaskProgress();
+}
+
+function updateProgressBar(agentIndex) {
+    const progress = taskProgress[agentIndex];
+    if (!progress) return;
+    
+    const percentage = (progress.completed / progress.total) * 100;
+    const progressBar = document.getElementById(`progress-bar-${agentIndex}`);
+    const progressText = document.getElementById(`progress-${agentIndex}`);
+    
+    if (progressBar) {
+        progressBar.style.width = percentage + '%';
+        progressBar.classList.remove('bg-secondary', 'bg-warning', 'bg-success');
+        if (percentage === 100) {
+            progressBar.classList.add('bg-success');
+        } else if (percentage >= 50) {
+            progressBar.classList.add('bg-warning');
+        } else {
+            progressBar.classList.add('bg-secondary');
+        }
+    }
+    
+    if (progressText) {
+        progressText.textContent = `${progress.completed}/${progress.total} completadas`;
+    }
+}
+
+function saveTaskProgress() {
+    localStorage.setItem('astramech_task_progress', JSON.stringify(taskProgress));
+}
+
+function activateAllAgents() {
+    {% if results.agents %}
+    {% for agent in results.agents %}
+    {% set agent_index = loop.index0 %}
+    {% for task in agent.tasks %}
+    const checkbox_{{ agent_index }}_{{ loop.index0 }} = document.getElementById('task-{{ agent_index }}-{{ loop.index0 }}');
+    if (checkbox_{{ agent_index }}_{{ loop.index0 }} && !checkbox_{{ agent_index }}_{{ loop.index0 }}.checked) {
+        checkbox_{{ agent_index }}_{{ loop.index0 }}.checked = true;
+        updateTaskProgress({{ agent_index }}, {{ loop.index0 }}, true);
+    }
+    {% endfor %}
+    {% endfor %}
+    {% endif %}
+    
+    showToast('Todos los agentes han sido activados. ¡Empieza a trabajar en las tareas!', 'success');
+}
+
+function saveAnalysis() {
+    const analysisData = {
+        company: '{{ results.company_name }}',
+        date: new Date().toISOString(),
+        efficiency_score: document.getElementById('efficiencyScore') ? document.getElementById('efficiencyScore').textContent : 'N/A',
+        agents: {{ results.agents | tojson if results.agents else '[]' }},
+        task_progress: taskProgress
+    };
+    
+    const savedAnalyses = JSON.parse(localStorage.getItem('astramech_saved_analyses') || '[]');
+    savedAnalyses.push(analysisData);
+    localStorage.setItem('astramech_saved_analyses', JSON.stringify(savedAnalyses));
+    
+    showToast('Análisis guardado exitosamente. Puedes acceder a él desde el historial.', 'success');
+}
+
+function exportFullReport() {
+    const report = {
+        company: '{{ results.company_name }}',
+        date: new Date().toISOString(),
+        efficiency_score: document.getElementById('efficiencyScore') ? document.getElementById('efficiencyScore').textContent : 'N/A',
+        kpis: {{ results.kpi_results | tojson if results.kpi_results else '{}' }},
+        agents: {{ results.agents | tojson if results.agents else '[]' }},
+        task_progress: taskProgress,
+        summary: '{{ results.summary_message | safe if results.summary_message else "" }}'
+    };
+    
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `astramech-report-{{ results.company_name }}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('Reporte completo exportado exitosamente.', 'success');
+}
+
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'info'} alert-dismissible fade show`;
+    toast.role = 'alert';
+    toast.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
+
 // Initialize Charts
 document.addEventListener('DOMContentLoaded', function() {
+    initializeTaskProgress();
+    
     {% if not results.error and results.kpi_results %}
     const results = {{ results | tojson }};
     

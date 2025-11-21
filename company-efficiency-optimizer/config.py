@@ -105,6 +105,15 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Strict'
+    
+    # Use cookie-based sessions for Vercel (no filesystem access)
+    SESSION_TYPE = 'cookie'
+    SESSION_PERMANENT = False
+    SESSION_USE_SIGNER = True
+    
+    # Vercel-specific: Use /tmp for temporary files
+    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/tmp/uploads')
+    SESSION_FILE_DIR = '/tmp/flask_session'
 
 
 class TestingConfig(Config):

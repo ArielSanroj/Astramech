@@ -63,6 +63,7 @@ class EnhancedDataIngestion:
                 r'GANANCIA NETA'
             ]
         }
+        self.universal_parser = UniversalExcelParser()
     
     def process_excel_file(self, file_path: str, company_name: str = None, department: str = 'Finance') -> Dict[str, Any]:
         """
@@ -139,9 +140,11 @@ class EnhancedDataIngestion:
             financial_data['employee_count'] = self._estimate_employee_count_improved(financial_data)
             print(f"👥 Estimated employee count: {financial_data['employee_count']}")
             
-            # Fallback: if core metrics missing, try generalized LLM parsing
-            if not financial_data.get('revenue') and not financial_data.get('operating_income'):
+            # Fallback: if any core metric is missing OR forced via env, try generalized LLM parsing via Ollama
+            force_llm = os.getenv('FORCE_LLM_PARSE', '0') == '1'
+            if force_llm or (not financial_data.get('revenue') or not financial_data.get('operating_income')):
                 try:
+                    print("   ⚙️  Structured parse incomplete → invoking Ollama fallback parser...")
                     document_text = self._excel_to_text(file_path)
                     llm_parsed = self.generalized_parse_excel(document_text)
                     if isinstance(llm_parsed, dict) and llm_parsed:
@@ -159,6 +162,7 @@ class EnhancedDataIngestion:
                             'total_liabilities': llm_parsed.get('liabilities'),
                             'total_equity': llm_parsed.get('equity'),
                         }
+                        print(f"   🤖 LLM parsed raw: {llm_parsed}")
                         for k, v in mapped.items():
                             if v not in (None, "N/A", ""):
                                 financial_data[k] = v
@@ -171,6 +175,16 @@ class EnhancedDataIngestion:
                 except Exception as _:
                     pass
 
+            # Keyword-based fallback before invoking LLM
+            if not financial_data.get('revenue') or not financial_data.get('operating_income'):
+                try:
+                    universal_metrics = self.universal_parser.parse(file_path)
+                    if universal_metrics:
+                        print("   🔍 Universal parser extracted metrics:", universal_metrics)
+                        self._merge_financial_metrics(financial_data, universal_metrics)
+                except Exception as parse_err:
+                    print(f"   ⚠️ Universal parser failed: {parse_err}")
+
             # Validate currency and data consistency
             self._validate_financial_data(financial_data)
             
@@ -181,6 +195,37 @@ class EnhancedDataIngestion:
             import traceback
             traceback.print_exc()
             return {}
+    def _merge_financial_metrics(self, financial_data: Dict[str, Any], parsed_metrics: Dict[str, Any]) -> None:
+        """Merge metrics returned by the universal parser into the financial dataset."""
+        mapping = {
+            'revenue': 'revenue',
+            'cogs': 'cogs',
+            'opex': 'operating_expenses',
+            'operating_income': 'operating_income',
+            'net_income': 'net_income',
+            'total_assets': 'total_assets',
+            'cash': 'cash_and_equivalents',
+            'estimated_employees': 'employee_count'
+        }
+
+        for source_key, target_key in mapping.items():
+            value = parsed_metrics.get(source_key)
+            if value in (None, '', 'N/A'):
+                continue
+            if target_key == 'cash_and_equivalents':
+                value = abs(float(value))
+            if target_key == 'employee_count':
+                financial_data[target_key] = value
+                continue
+            if not financial_data.get(target_key):
+                financial_data[target_key] = value
+
+        if parsed_metrics.get('company'):
+            financial_data['company'] = parsed_metrics['company']
+        if parsed_metrics.get('period'):
+            financial_data['period'] = parsed_metrics['period']
+        if parsed_metrics.get('currency'):
+            financial_data['currency'] = parsed_metrics['currency']
 
     def _excel_to_text(self, file_path: str) -> str:
         """Convert all Excel sheets to a plain text representation for LLM parsing."""
@@ -646,6 +691,109 @@ class EnhancedDataIngestion:
             print(f"   ✅ Data validation passed")
 
 # Global enhanced data ingestion instance
+class UniversalExcelParser:
+    """Keyword-driven Excel parser for heterogeneous NIIF layouts."""
+
+    def __init__(self):
+        self.revenue_keywords = [
+            "INGRESOS DE ACTIVIDADES ORDINARIAS", "INGRESOS ORDINARIOS", "VENTAS BRUTAS",
+            "REVENUE", "SALES", "INGRESOS OPERACIONALES"
+        ]
+        self.cogs_keywords = [
+            "COSTO DE VENTAS", "COSTO DE LA MERCANCIA VENDIDA", "COST OF SALES", "COGS"
+        ]
+        self.opex_keywords = [
+            "GASTOS DE ADMINISTRACION", "GASTOS OPERATIVOS", "OPERATING EXPENSES", "GASTOS DE OPERACION"
+        ]
+        self.operating_income_keywords = [
+            "RESULTADO OPERACIONAL", "UTILIDAD OPERATIVA", "OPERATING INCOME"
+        ]
+        self.net_income_keywords = [
+            "RESULTADO DEL EJERCICIO", "UTILIDAD NETA", "NET INCOME", "RESULTADO INTEGRAL"
+        ]
+        self.total_assets_keywords = [
+            "TOTAL ACTIVO", "TOTAL DE ACTIVOS", "TOTAL ASSETS"
+        ]
+        self.cash_keywords = [
+            "EFECTIVO Y EQUIVALENTES", "CASH AND CASH EQUIVALENTS", "DISPONIBILIDADES"
+        ]
+        self.payroll_keywords = [
+            "GASTOS DE PERSONAL", "SUELDOS", "PAYROLL", "SALARIOS"
+        ]
+        self.company_markers = ["APRU", "CARMANFE", "SAS", "S.A.S.", "LTDA"]
+
+    def parse(self, file_path: str) -> Dict[str, Any]:
+        workbook = pd.ExcelFile(file_path)
+        result: Dict[str, Any] = {
+            "company": None,
+            "period": None,
+            "currency": "COP",
+            "revenue": None,
+            "cogs": None,
+            "opex": None,
+            "operating_income": None,
+            "net_income": None,
+            "total_assets": None,
+            "cash": None,
+            "estimated_employees": None
+        }
+
+        for sheet in workbook.sheet_names:
+            df = workbook.parse(sheet, header=None)
+            text_blob = " ".join(df.astype(str).fillna("").values.flatten())
+            company_match = next((marker for marker in self.company_markers if marker in text_blob.upper()), None)
+            if company_match and not result["company"]:
+                result["company"] = company_match
+            period_match = re.search(r'(ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)[A-Za-z\s]*\d{4}', text_blob, re.IGNORECASE)
+            if period_match and not result["period"]:
+                result["period"] = period_match.group(0)
+
+            result["revenue"] = result["revenue"] or self._find_value_in_df(df, self.revenue_keywords)
+            result["cogs"] = result["cogs"] or self._find_value_in_df(df, self.cogs_keywords)
+            result["opex"] = result["opex"] or self._find_value_in_df(df, self.opex_keywords)
+            result["operating_income"] = result["operating_income"] or self._find_value_in_df(df, self.operating_income_keywords)
+            result["net_income"] = result["net_income"] or self._find_value_in_df(df, self.net_income_keywords)
+            result["total_assets"] = result["total_assets"] or self._find_value_in_df(df, self.total_assets_keywords, min_abs=1000)
+            result["cash"] = result["cash"] or self._find_value_in_df(df, self.cash_keywords, min_abs=1000)
+
+            payroll_value = self._find_value_in_df(df, self.payroll_keywords, min_abs=1000)
+            if payroll_value and not result["estimated_employees"]:
+                result["estimated_employees"] = max(1, round(payroll_value / 940000))
+
+        return result
+
+    def _find_value_in_df(self, df: pd.DataFrame, keywords: List[str], min_abs: float = 1.0) -> Optional[float]:
+        if df.empty:
+            return None
+        normalized = df.astype(str).fillna("")
+        for keyword in keywords:
+            keyword_mask = normalized.apply(lambda col: col.str.contains(keyword, case=False, na=False))
+            row_matches = keyword_mask.any(axis=1)
+            if not row_matches.any():
+                continue
+            row_idx = row_matches[row_matches].index[0]
+            row_values = df.loc[row_idx]
+            for raw_value in reversed(row_values.dropna().values):
+                numeric = self._clean_numeric(raw_value)
+                if numeric is not None and abs(numeric) >= min_abs:
+                    return numeric
+        return None
+
+    def _clean_numeric(self, value: Any) -> Optional[float]:
+        if isinstance(value, (int, float)):
+            numeric = float(value)
+            return numeric if abs(numeric) >= 1 else None
+        if isinstance(value, str):
+            stripped = re.sub(r'[^\d\-,.]', '', value)
+            stripped = stripped.replace(',', '')
+            try:
+                numeric = float(stripped)
+                return numeric if abs(numeric) >= 1 else None
+            except ValueError:
+                return None
+        return None
+
+
 enhanced_data_ingestion = EnhancedDataIngestion()
 
 def get_enhanced_data_ingestion() -> EnhancedDataIngestion:

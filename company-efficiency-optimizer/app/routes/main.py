@@ -65,7 +65,17 @@ def results():
         flash('No analysis results found. Please run an analysis first.', 'error')
         return redirect(url_for('main.index'))
     
+    # Mark analysis as viewed
+    session['analysis_viewed'] = True
+    
     return render_template('results.html', results=results)
+
+@main_bp.route('/clear_session', methods=['POST'])
+def clear_session():
+    """Clear session data for new analysis"""
+    session.clear()
+    flash('Sesión limpiada. Puedes iniciar un nuevo análisis.', 'success')
+    return redirect(url_for('main.index'))
 
 @main_bp.route('/robots.txt')
 def robots():
