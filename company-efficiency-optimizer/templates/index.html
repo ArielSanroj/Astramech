@@ -1,34 +1,44 @@
 {% extends 'base.html' %}
-{% block title %}AstraMech - Optimize Every Department with AI Agents{% endblock %}
-{% block meta_description %}Upload Excel, CSV, or PDF data from any department and let AstraMech benchmark your KPIs against 2025 standards, activate specialized AI agents, and deliver an actionable plan in minutes.{% endblock %}
+{% block title %}Astramech - Automatiza Ventas, Marketing, Finanzas y RRHH con Agentes de IA{% endblock %}
+{% block meta_description %}Sistema unificado de agentes de IA especializados que automatiza marketing, ventas, finanzas y recursos humanos. On-premise, seguro, sin suscripciones.{% endblock %}
 {% block content %}
 <style>
+    /* Diseño limpio sin AI Slop */
     .hero-section {
-        background: linear-gradient(135deg, rgba(11, 17, 32, 0.95) 0%, rgba(20, 27, 53, 0.95) 100%);
-        padding: 120px 0 80px;
+        background: var(--color-bg-gradient);
+        padding: var(--spacing-section-large) 0 var(--spacing-section);
+        border-bottom: 1px solid rgba(123, 97, 255, 0.1);
         position: relative;
+        overflow: hidden;
     }
 
     .hero-section::before {
         content: '';
         position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at 50% 50%, rgba(123, 97, 255, 0.12) 0%, transparent 70%);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 50% 0%, rgba(123, 97, 255, 0.05) 0%, transparent 50%);
         pointer-events: none;
     }
 
     .hero-title {
-        font-size: 56px;
-        font-weight: 700;
-        line-height: 1.2;
-        margin-bottom: 1.5rem;
+        font-size: 42px;
+        font-weight: 600;
+        line-height: 1.3;
+        margin-bottom: 1rem;
+        color: var(--color-text-primary);
+        letter-spacing: -0.02em;
     }
 
     .hero-subtitle {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         color: var(--color-text-secondary);
-        max-width: 900px;
+        max-width: 700px;
         margin: 0 auto 2rem;
+        line-height: 1.6;
+        font-weight: 400;
     }
 
     .hero-cta {
@@ -47,58 +57,58 @@
     }
 
     .proof-card {
-        background: rgba(18, 22, 38, 0.9);
-        border: 1px solid rgba(123, 97, 255, 0.25);
-        border-radius: var(--radius-md);
+        background: var(--color-surface);
+        border: 1px solid rgba(123, 97, 255, 0.15);
+        border-radius: 8px;
         padding: 1.5rem;
     }
 
     .proof-card h4 {
-        color: #fff;
-        font-size: 1.5rem;
-        margin-bottom: 0.3rem;
+        color: var(--color-text-primary);
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
     }
 
     .badge-pill {
-        background: rgba(45, 47, 72, 0.8);
-        border: 1px solid rgba(123, 97, 255, 0.3);
-        padding: 0.35rem 1rem;
-        border-radius: 999px;
+        background: var(--color-surface);
+        border: 1px solid rgba(123, 97, 255, 0.2);
+        padding: 0.4rem 0.9rem;
+        border-radius: 6px;
         color: var(--color-text-secondary);
-        font-size: 0.8rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+        font-size: 0.85rem;
         display: inline-flex;
         gap: 0.4rem;
         align-items: center;
+        font-weight: 500;
     }
 
     .stats-section {
         background: var(--color-bg);
-        padding: 60px 0;
+        padding: var(--spacing-section) 0;
     }
 
     .stat-card {
         background: var(--color-surface);
         border: 1px solid rgba(123, 97, 255, 0.1);
-        border-radius: var(--radius-md);
-        padding: 1.75rem;
+        border-radius: 8px;
+        padding: 2rem;
         height: 100%;
     }
 
     .stat-card h3 {
         color: var(--color-primary);
-        font-size: 2rem;
+        font-size: 1.75rem;
         margin-bottom: 0.5rem;
+        font-weight: 600;
     }
 
     .workflow-step {
         background: var(--color-surface);
         border: 1px solid rgba(123, 97, 255, 0.1);
-        border-radius: var(--radius-md);
+        border-radius: 8px;
         padding: 2rem;
         height: 100%;
-        box-shadow: var(--shadow-soft);
     }
 
     .workflow-step span {
@@ -113,13 +123,11 @@
     }
 
     .section-title {
-        font-size: 36px;
-        font-weight: 700;
+        font-size: 32px;
+        font-weight: 600;
         margin-bottom: 1rem;
-        background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-primary) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--color-text-primary);
+        letter-spacing: -0.01em;
     }
 
     .tab-buttons {
@@ -141,7 +149,7 @@
     }
 
     .tab-buttons button.active {
-        background: var(--color-primary-gradient);
+        background: var(--color-primary);
         color: #fff;
         border-color: transparent;
     }
@@ -149,10 +157,9 @@
     .agent-card {
         background: var(--color-surface);
         border: 1px solid rgba(123, 97, 255, 0.1);
-        border-radius: var(--radius-md);
+        border-radius: 8px;
         padding: 2rem;
         margin-bottom: 1.5rem;
-        box-shadow: var(--shadow-soft);
     }
     
     .capability-list {
@@ -175,8 +182,14 @@
         margin-bottom: 0.8rem;
     }
 
-    .status-active { background: var(--color-primary-gradient); color: #fff; }
-    .status-idle { background: rgba(255, 255, 255, 0.08); color: var(--color-text-secondary); }
+    .status-active { 
+        background: var(--color-primary); 
+        color: #fff; 
+    }
+    .status-idle { 
+        background: rgba(255, 255, 255, 0.08); 
+        color: var(--color-text-secondary); 
+    }
 
     .trigger-tag {
         display: inline-block;
@@ -191,10 +204,9 @@
 
     .recommendation-card {
         background: var(--color-surface);
-        border-radius: var(--radius-md);
+        border-radius: 8px;
         border: 1px solid rgba(123, 97, 255, 0.1);
         padding: 2rem;
-        box-shadow: var(--shadow-soft);
     }
 
     .impact-badge {
@@ -212,7 +224,7 @@
     .template-card, .testimonial-card, .faq-item {
         background: var(--color-surface);
         border: 1px solid rgba(123, 97, 255, 0.1);
-        border-radius: var(--radius-md);
+        border-radius: 8px;
         padding: 1.75rem;
         height: 100%;
     }
@@ -226,38 +238,700 @@
         color: var(--color-text-secondary);
         font-style: italic;
     }
+
+    .agent-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .agent-fact {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(123, 97, 255, 0.12);
+        border-radius: 8px;
+        padding: 0.45rem 0.65rem;
+        font-size: 0.95rem;
+        color: var(--color-text-secondary);
+    }
+
+    .agent-footnote {
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+        margin-top: 0.75rem;
+    }
+
+    .integration-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+    }
+
+    .integration-card {
+        background: var(--color-surface);
+        border: 1px solid rgba(123, 97, 255, 0.1);
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .integration-card h5 {
+        margin-bottom: 0.35rem;
+    }
+
+    .integration-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        border: 1px solid rgba(123, 97, 255, 0.2);
+        color: var(--color-text-secondary);
+        background: var(--color-surface-alt);
+    }
+
+    .pill.active {
+        background: var(--color-primary);
+        color: #fff;
+        border: none;
+    }
+
+    /* Problema y Solución Section */
+    .problem-section {
+        background: var(--color-surface-alt);
+        padding: var(--spacing-section) 0;
+    }
+
+    .problem-box {
+        background: var(--color-surface);
+        border-left: 3px solid rgba(255, 60, 60, 0.4);
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .solution-box {
+        background: rgba(123, 97, 255, 0.05);
+        border-left: 4px solid var(--color-primary);
+        padding: 2rem;
+        border-radius: 8px;
+    }
+
+    /* Unique Value Section */
+    .unique-value-section {
+        padding: var(--spacing-section) 0;
+    }
+    
+    /* Proceso moderno con línea horizontal */
+    .process-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin: 3rem 0;
+        padding: 0 2rem;
+    }
+    
+    .process-modern::before {
+        content: '';
+        position: absolute;
+        top: 30px;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--color-primary) 0%, rgba(123, 97, 255, 0.3) 100%);
+        z-index: 0;
+    }
+    
+    .process-point {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        flex: 1;
+    }
+    
+    .process-point-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+        box-shadow: 0 0 20px rgba(123, 97, 255, 0.3);
+    }
+    
+    .process-point h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .process-point p {
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+        margin: 0;
+    }
+
+    .value-point {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .value-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: rgba(123, 97, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-primary);
+        flex-shrink: 0;
+    }
+
+    /* Target Audience Section */
+    .audience-section {
+        background: var(--color-surface-alt);
+        padding: var(--spacing-section) 0;
+    }
+    
+    /* Highlight Cards para "Por qué es mejor" */
+    .highlight-card {
+        background: var(--color-surface);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 2.5rem;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .highlight-card:hover {
+        border-color: rgba(123, 97, 255, 0.3);
+        box-shadow: 0 0 40px rgba(123, 97, 255, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .highlight-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .highlight-icon.savings {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+    }
+    
+    .highlight-icon.speed {
+        background: rgba(123, 97, 255, 0.1);
+        color: var(--color-primary);
+    }
+    
+    .highlight-icon.intelligence {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+    
+    /* Cards de agentes mejoradas */
+    .agent-card {
+        background: var(--color-surface);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 2.25rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .agent-card:hover {
+        border-color: rgba(123, 97, 255, 0.3);
+        box-shadow: 0 0 40px rgba(123, 97, 255, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Testimonios slider */
+    .testimonials-slider {
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .testimonial-slide {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .testimonial-slide.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .slider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+    
+    .slider-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(123, 97, 255, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .slider-dot.active {
+        background: var(--color-primary);
+        width: 24px;
+        border-radius: 4px;
+    }
+    
+    /* CTA Sticky Mobile */
+    .cta-sticky-mobile {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--color-surface);
+        border-top: 1px solid rgba(123, 97, 255, 0.1);
+        padding: 1rem;
+        z-index: 1000;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+        .cta-sticky-mobile {
+            display: block;
+        }
+    }
+    
+    /* Logos section */
+    .logos-section {
+        padding: var(--spacing-section) 0;
+        background: var(--color-surface-alt);
+    }
+    
+    .logos-grid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+        opacity: 0.6;
+    }
+    
+    .logo-item {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+    }
+
+    .audience-card {
+        background: var(--color-surface);
+        border: 1px solid rgba(123, 97, 255, 0.1);
+        border-radius: 8px;
+        padding: 2rem;
+        height: 100%;
+    }
+
+    /* Logo destacado */
+    .navbar-brand {
+        font-size: 1.75rem !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.02em !important;
+        padding: 0.5rem 0 !important;
+    }
+
+    .navbar-brand i {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+
+    /* Mejoras adicionales */
+    .trust-badges {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        justify-content: center;
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-text-secondary);
+        font-size: 0.9rem;
+    }
+
+
+    .process-timeline {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        position: relative;
+        margin: 3rem 0;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .process-timeline::before {
+        content: '';
+        position: absolute;
+        top: 40px;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: var(--color-primary);
+        z-index: 0;
+    }
+
+    .timeline-item {
+        flex: 1;
+        min-width: 250px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .timeline-number {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 auto 1.5rem;
+    }
+
+    .timeline-content h4 {
+        margin-bottom: 1rem;
+    }
+
+    .timeline-visual {
+        margin-top: 1.5rem;
+        color: var(--color-primary);
+    }
+
+    .testimonial-card-enhanced {
+        background: var(--color-surface);
+        border: 1px solid rgba(123, 97, 255, 0.1);
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        height: 100%;
+    }
+
+    .testimonial-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .testimonial-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--color-primary);
+    }
+
+    .testimonial-rating {
+        margin-left: auto;
+    }
+
+    .testimonial-text {
+        color: var(--color-text-secondary);
+        font-style: italic;
+        margin-bottom: 1rem;
+        line-height: 1.8;
+    }
+
+    .testimonial-metrics {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .metric-badge {
+        background: rgba(123, 97, 255, 0.1);
+        border: 1px solid rgba(123, 97, 255, 0.2);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+    }
+
+    .cta-section {
+        background: var(--color-primary);
+        padding: var(--spacing-section) 0;
+    }
+    
+    .faq-section {
+        padding: var(--spacing-section) 0;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+
+    .accordion-item {
+        background: var(--color-surface);
+        border: 1px solid rgba(123, 97, 255, 0.1);
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+    }
+
+    .accordion-button {
+        background: var(--color-surface);
+        color: var(--color-text-primary);
+        border: none;
+        font-weight: 600;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: rgba(123, 97, 255, 0.1);
+        color: var(--color-primary);
+    }
+
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(123, 97, 255, 0.25);
+    }
+
+    .accordion-body {
+        color: var(--color-text-secondary);
+    }
+
+    @media (max-width: 768px) {
+        .process-timeline::before {
+            display: none;
+        }
+        .timeline-item {
+            min-width: 100%;
+        }
+        .trust-badges {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+    }
 </style>
 
+<!-- Hero Section - Nuevo Enfoque: No Contrates, Activa Agentes -->
 <section class="hero-section">
-    <div class="container text-center position-relative">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
         <h1 class="hero-title">
-            Optimize Any Business Area<br>
-            <span style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                with AI Agents Tailored to Your KPIs
-            </span>
+                    No contrates más personal. Activa Agentes de IA listos para trabajar hoy.
         </h1>
         <p class="hero-subtitle">
-            Upload Excel, CSV, or PDF data from Sales, Finance, HR, IT, or Operations—AstraMech benchmarks you against 2025 industry standards and activates specialized AI agents in under five minutes.
-        </p>
-        <div class="hero-cta">
-            <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-lg">Upload Your Data</a>
-            <a href="{{ url_for('main.results') }}" class="btn btn-outline-light btn-lg">See Interactive Demo</a>
+                    Astramech analiza tus archivos y activa agentes expertos en Finanzas, Ventas, Marketing y RRHH que hacen el trabajo de un equipo completo—sin nómina, sin consultorías, sin curvas de aprendizaje.
+                </p>
+                <div class="hero-cta justify-content-start mt-4">
+                    <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-lg">
+                        Activar mi primer agente (Gratis)
+                    </a>
         </div>
-        <div class="badge-pill">
-            <i class="fas fa-bolt"></i> 221 datasets analyzed · Avg +27% KPI lift
+                <div class="trust-badges mt-4">
+                    <div class="trust-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Sin contratar talento adicional</span>
         </div>
-        <div class="proof-grid">
-            <div class="proof-card">
-                <h4>5 min</h4>
-                <p>From upload to AI recommendations.</p>
+                    <div class="trust-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Recomendaciones en 5 minutos</span>
             </div>
-            <div class="proof-card">
-                <h4>Any File</h4>
-                <p>Excel, CSV, PDF (NIIF-ready parser).</p>
+                    <div class="trust-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>100% On-Premise (tus datos nunca salen)</span>
             </div>
-            <div class="proof-card">
-                <h4>On-Prem</h4>
-                <p>Runs locally with Ollama + CrewAI.</p>
+                    <div class="trust-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>7 agentes integrados listos para ejecutar</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="proof-grid" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                    <div class="proof-card" style="padding: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; background: rgba(123, 97, 255, 0.1); display: flex; align-items: center; justify-content: center; color: var(--color-primary);">
+                                <i class="fas fa-users fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 1.25rem;">5-10 Roles</h4>
+                                <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-secondary);">Reemplaza analistas, SDRs, especialistas PPC y HR</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proof-card" style="padding: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; background: rgba(123, 97, 255, 0.1); display: flex; align-items: center; justify-content: center; color: var(--color-primary);">
+                                <i class="fas fa-clock fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 1.25rem;">24/7</h4>
+                                <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-secondary);">Trabajan sin descanso, sin errores por cansancio</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Problema que Resuelve - Enfoque en Contratar Personas -->
+<section class="problem-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <h2 class="section-title text-center mb-4">El Problema Real</h2>
+                <div class="problem-box">
+                    <h4 style="color: var(--color-danger); margin-bottom: 1rem;">Las empresas quieren ser más rápidas… pero el crecimiento depende de:</h4>
+                    <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                        <li>❌ <strong>Contratar más personal</strong> — procesos lentos, costos altos</li>
+                        <li>❌ <strong>Pagar consultorías eternas</strong> — semanas de análisis, facturas grandes</li>
+                        <li>❌ <strong>Integrar múltiples herramientas</strong> — cada departamento necesita su plataforma</li>
+                        <li>❌ <strong>Capacitar equipos nuevos</strong> — onboarding de 2-8 semanas</li>
+                        <li>❌ <strong>Depender de expertos externos</strong> — disponibilidad limitada, costos variables</li>
+                    </ul>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-top: 1.5rem; margin-bottom: 0;">
+                        <strong>Resultado:</strong> Procesos lentos, gastos crecientes, decisiones tardías y operaciones fragmentadas.
+                    </p>
+                </div>
+                <div class="solution-box">
+                    <h4 style="color: var(--color-primary); margin-bottom: 1rem;">La Solución: Activa Agentes IA en lugar de contratar humanos</h4>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        Astramech te permite <strong>activar especialistas listos para trabajar</strong> en Finanzas, Marketing, Ventas y RRHH.
+                    </p>
+                    <div style="margin-top: 1.5rem;">
+                        <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 0.5rem;"><strong>Cada agente:</strong></p>
+                        <ul style="color: var(--color-text-secondary); line-height: 1.8; margin: 0;">
+                            <li>✅ Trabaja 24/7</li>
+                            <li>✅ No necesita onboarding</li>
+                            <li>✅ Produce resultados en minutos</li>
+                            <li>✅ Cubre tareas de analistas, SDRs, especialistas PPC y HR</li>
+                            <li>✅ Corre 100% en tu servidor</li>
+                        </ul>
+                    </div>
+                    <p style="color: var(--color-text-primary); line-height: 1.8; margin-top: 1.5rem; margin-bottom: 0; font-weight: 600;">
+                        Es como <strong>contratar 5–10 empleados en un solo clic</strong>, sin salarios ni fricciones.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cómo Funciona - Versión Centrada en Agilidad -->
+<section class="unique-value-section">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Cómo Funciona (versión centrada en agilidad)</h2>
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="process-modern">
+                    <div class="process-point">
+                        <div class="process-point-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h4>Sube tus archivos</h4>
+                        <p>P&L, balanza, nómina, leads, campañas</p>
+                    </div>
+                    <div class="process-point">
+                        <div class="process-point-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h4>Astramech entiende</h4>
+                        <p>Sin onboarding, sin capacitación</p>
+                    </div>
+                    <div class="process-point">
+                        <div class="process-point-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h4>Activa agentes</h4>
+                        <p>Resultados en minutos</p>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-lg">
+                        Activar un agente ahora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Por qué es mejor que contratar - 3 Highlight Cards -->
+<section class="audience-section">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Por qué es mejor que contratar</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="highlight-card">
+                    <div class="highlight-icon savings">
+                        💸
+                    </div>
+                    <h4>Ahorro</h4>
+                    <p style="color: var(--color-text-secondary); margin: 0;">
+                        Una fracción del costo de sueldos, prestaciones y consultorías. Sin nómina, sin beneficios, sin rotación.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="highlight-card">
+                    <div class="highlight-icon speed">
+                        ⚡
+                    </div>
+                    <h4>Velocidad</h4>
+                    <p style="color: var(--color-text-secondary); margin: 0;">
+                        Resultados en 5 minutos vs. onboarding de 2-8 semanas. Sin capacitación, sin esperas, sin fricciones.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="highlight-card">
+                    <div class="highlight-icon intelligence">
+                        🧠
+                    </div>
+                    <h4>Inteligencia coordinada</h4>
+                    <p style="color: var(--color-text-secondary); margin: 0;">
+                        Agentes que trabajan juntos 24/7. Consistencia sin errores, escalabilidad infinita, todo en una plataforma.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -290,30 +964,39 @@
 
 <section style="background: var(--color-surface-alt); padding: 80px 0;">
     <div class="container">
-        <h2 class="section-title text-center mb-3">How AstraMech Works</h2>
+        <h2 class="section-title text-center mb-3">Cómo Funciona Astramech</h2>
         <p class="lead text-center mb-5" style="max-width: 820px; margin: 0 auto; color: var(--color-text-secondary);">
             No consultants, no month-long projects. Upload your files, let the system calculate KPIs vs. 2025 benchmarks, and receive a tactical playbook from AI agents trained on your department.
         </p>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="workflow-step">
-                    <span>Step 1</span>
-                    <h4>Upload & Auto-Clean</h4>
-                    <p>Drop Excel, CSV, or PDF P&Ls, HR reports, or operational trackers. The universal parser understands NIIF and messy spreadsheets.</p>
+        <div class="process-timeline">
+            <div class="timeline-item">
+                <div class="timeline-number">1</div>
+                <div class="timeline-content">
+                    <h4>Sube tus Datos</h4>
+                    <p>Excel, CSV o PDF de cualquier departamento</p>
+                    <div class="timeline-visual">
+                        <i class="fas fa-file-upload fa-3x"></i>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="workflow-step">
-                    <span>Step 2</span>
-                    <h4>Benchmark & Diagnose</h4>
-                    <p>KPICalculator crunches margins, turnover, productivity, and cost efficiency against 2025 global and Colombian benchmarks.</p>
+                </div>
+            <div class="timeline-item">
+                <div class="timeline-number">2</div>
+                <div class="timeline-content">
+                    <h4>Análisis Automático</h4>
+                    <p>KPIs comparados con benchmarks 2025</p>
+                    <div class="timeline-visual">
+                        <i class="fas fa-brain fa-3x"></i>
+            </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="workflow-step">
-                    <span>Step 3</span>
-                    <h4>AI Agents Activate</h4>
-                    <p>Diagnostic, HR, Operations, and Finance agents generate actionable recommendations and ready-to-export roadmaps.</p>
+            <div class="timeline-item">
+                <div class="timeline-number">3</div>
+                <div class="timeline-content">
+                    <h4>Agentes Activan</h4>
+                    <p>Recomendaciones accionables en minutos</p>
+                    <div class="timeline-visual">
+                        <i class="fas fa-robot fa-3x"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -322,144 +1005,318 @@
 
 <section id="agents" style="background: var(--color-bg); padding: 80px 0;">
     <div class="container">
-        <h2 class="section-title text-center mb-3">AI Agent System</h2>
+        <h2 class="section-title text-center mb-3">Agentes Disponibles (actívalos como "empleados digitales")</h2>
         <p class="lead text-center mb-5" style="max-width: 900px; margin: 0 auto; color: var(--color-text-secondary);">
-            AstraMech uses a coordinated system of specialized agents powered by CrewAI, Ollama, and Pinecone. Each focuses on a department while the Diagnostic Agent orchestrates the overall analysis.
+            Cada agente reemplaza a un rol específico. Actívalos cuando los necesites, sin contratar, sin capacitar, sin esperar.
         </p>
         <div class="tab-buttons">
-            <button class="active" data-agent-tab="diagnostic">Diagnostic</button>
-            <button data-agent-tab="financial">Finance</button>
-            <button data-agent-tab="hr">HR</button>
-            <button data-agent-tab="operations">Operations</button>
+            <button class="active" data-agent-tab="finanzas">Finanzas</button>
+            <button data-agent-tab="marketing">Marketing</button>
+            <button data-agent-tab="ventas">Ventas</button>
+            <button data-agent-tab="rrhh">RRHH</button>
+            <button data-agent-tab="legal">Legal / Roadmap</button>
         </div>
-        <div class="row agent-tab" data-agent-content="diagnostic">
+
+        <div class="row agent-tab" data-agent-content="finanzas">
             <div class="col-md-6">
                 <div class="agent-card">
-                    <span class="status-badge status-active">Active</span>
-                    <h4>Diagnostic Agent · Principal Coordinator</h4>
-                    <p>Orchestrates all analysis, identifies inefficiencies, and generates executive reports.</p>
-                    <ul class="capability-list">
-                        <li>General inefficiency detection</li>
-                        <li>Executive report generation</li>
-                        <li>Multi-agent coordination</li>
-                        <li>Strategic recommendations</li>
-                    </ul>
-                    <div>
-                        <strong>Triggered by:</strong>
-                        <span class="trigger-tag">All data uploads</span>
-                        <span class="trigger-tag">Comprehensive analysis</span>
+                    <span class="status-badge status-active">Activo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Repo: supervincent</span>
+                        <span class="agent-fact">On-prem · credenciales por cliente</span>
                     </div>
+                    <h4>Finanzas — SuperVincent</h4>
+                    <p><strong>Tu analista contable + fiscalista + auditor 24/7.</strong> Analiza P&L, valida impuestos NIIF, detecta fugas de margen y genera reportes automáticos.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: P&L, balanza, facturas</span>
+                        <span class="pill">Output: KPIs, obligaciones, recomendaciones</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-primary btn-sm">Subir P&L</a>
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-outline-light btn-sm">Ver flujo financiero</a>
+                        <a href="{{ url_for('main.supervincent_agent') }}" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Conectado · Ejecuta en tu entorno.</div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="agent-card">
-                    <span class="status-badge status-active">Active</span>
-                    <h4>Financial Optimizer · Performance Analyst</h4>
-                    <p>Calculates financial KPIs, analyzes margins, and evaluates profitability.</p>
-                    <ul class="capability-list">
-                        <li>KPI calculation (EBITDA, margins)</li>
-                        <li>Profitability analysis</li>
-                        <li>Revenue optimization</li>
-                        <li>Financial benchmarking</li>
-                    </ul>
-                    <div>
-                        <strong>Triggered by:</strong>
-                        <span class="trigger-tag">P&L statements</span>
-                        <span class="trigger-tag">Revenue reports</span>
+                    <span class="status-badge status-active">Activo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Interno</span>
+                        <span class="agent-fact">CrewAI + Ollama</span>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="row agent-tab d-none" data-agent-content="financial">
-            <div class="col-md-6">
-                <div class="agent-card">
-                    <span class="status-badge status-active">Active</span>
                     <h4>Cash Flow Sentinel</h4>
-                    <p>Monitors liquidity, burn rate, and covenant risks.</p>
-                    <ul class="capability-list">
-                        <li>Cash runway projections</li>
-                        <li>Variance explanations</li>
-                        <li>Scenario planning</li>
-                    </ul>
-                    <div>
-                        <strong>Triggered by:</strong>
-                        <span class="trigger-tag">Cash-flow statements</span>
-                        <span class="trigger-tag">ERP exports</span>
+                    <p><strong>Tu analista de liquidez 24/7.</strong> Monitorea cash flow, burn rate y riesgos de covenants en tiempo real.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: Cash-flow / ERP</span>
+                        <span class="pill">Output: Proyecciones, alertas, escenarios</span>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="agent-card">
-                    <span class="status-badge status-idle">Idle</span>
-                    <h4>Benchmark Scout</h4>
-                    <p>Compares KPIs against 2025 industry metrics and flags outliers.</p>
-                    <ul class="capability-list">
-                        <li>Industry KPI matching</li>
-                        <li>Sensitivity scoring</li>
-                        <li>Board-ready visuals</li>
-                    </ul>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-primary btn-sm">Subir cash-flow</a>
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-outline-light btn-sm">Ver demo</a>
+                        <a href="https://github.com/ArielSanroj/supervincent" target="_blank" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Activo · Seguridad: datos locales.</div>
                 </div>
             </div>
         </div>
-        <div class="row agent-tab d-none" data-agent-content="hr">
+
+        <div class="row agent-tab d-none" data-agent-content="marketing">
             <div class="col-md-6">
                 <div class="agent-card">
-                    <span class="status-badge status-idle">Idle</span>
-                    <h4>HR Optimizer · Talent Specialist</h4>
-                    <p>Analyzes HR metrics, calculates turnover, and optimizes talent management.</p>
-                    <ul class="capability-list">
-                        <li>Turnover rate analysis</li>
-                        <li>Productivity metrics</li>
-                        <li>Talent optimization</li>
-                        <li>Engagement insights</li>
-                    </ul>
-                    <div>
-                        <strong>Triggered by:</strong>
-                        <span class="trigger-tag">HR data</span>
-                        <span class="trigger-tag">Employee metrics</span>
-                        <span class="trigger-tag">Headcount reports</span>
+                    <span class="status-badge status-idle">Listo (wiring)</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Repo: marketingagentcompanies</span>
+                        <span class="agent-fact">TikTok Ads</span>
                     </div>
+                    <h4>Marketing TikTok</h4>
+                    <p><strong>Tu estratega de contenido + analista de métricas + generador de scripts.</strong> Optimiza campañas, presupuesto y creatividades TikTok.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: credenciales TikTok + campañas</span>
+                        <span class="pill">Output: cambios de presupuesto, creatividades</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-sm">Solicitar demo</a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-sm">Ver flujo marketing</a>
+                        <a href="https://github.com/ArielSanroj/marketingagentcompanies" target="_blank" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: wiring final · Seguridad: credenciales por cliente.</div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="agent-card">
-                    <span class="status-badge status-idle">Idle</span>
-                    <h4>Workforce Balancer</h4>
-                    <p>Forecasts staffing needs and workload distribution.</p>
-                    <ul class="capability-list">
-                        <li>Utilization tracking</li>
-                        <li>Skill-gap detection</li>
-                        <li>Training recommendations</li>
-                    </ul>
+                    <span class="status-badge status-active">Activo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Repo: marketingagent</span>
+                        <span class="agent-fact">Google Ads</span>
+                    </div>
+                    <h4>Marketing Google Ads</h4>
+                    <p><strong>Tu especialista PPC optimizando campañas, pujas, estructuras y creatividades.</strong> Reemplaza freelancer + analista PPC.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: MCC/cliente + objetivos</span>
+                        <span class="pill">Output: planes de puja, assets, experiments</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-sm">Conectar MCC</a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-sm">Ver guía</a>
+                        <a href="https://github.com/ArielSanroj/marketingagent" target="_blank" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Conectado.</div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <div class="agent-card">
+                    <span class="status-badge status-active">Activo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Repo: linkedinposting</span>
+                        <span class="agent-fact">LinkedIn</span>
+                    </div>
+                    <h4>Marketing LinkedIn</h4>
+                    <p><strong>Tu community manager + redactor de comentarios + analista de engagement.</strong> Publica comentarios según voz de marca y reglas de compliance.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: perfiles, posts, tono</span>
+                        <span class="pill">Output: comentarios programados</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-sm">Activar LinkedIn</a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-sm">Ver flujo</a>
+                        <a href="https://github.com/ArielSanroj/linkedinposting" target="_blank" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Conectado · Cookies/Session por cliente.</div>
                 </div>
             </div>
         </div>
-        <div class="row agent-tab d-none" data-agent-content="operations">
+
+        <div class="row agent-tab d-none" data-agent-content="ventas">
             <div class="col-md-6">
                 <div class="agent-card">
-                    <span class="status-badge status-idle">Idle</span>
-                    <h4>Operations Optimizer · Process Expert</h4>
-                    <p>Evaluates operational efficiency, analyzes processes, and identifies bottlenecks.</p>
-                    <ul class="capability-list">
-                        <li>Process efficiency analysis</li>
-                        <li>Bottleneck identification</li>
-                        <li>Cost optimization</li>
-                        <li>Workflow improvement</li>
-                    </ul>
+                    <span class="status-badge status-active">Activo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Repo: callagent</span>
+                        <span class="agent-fact">Outbound</span>
+                    </div>
+                    <h4>Ventas — Outbound Agent</h4>
+                    <p><strong>Tu SDR infinito.</strong> Hace llamadas, crea scripts, genera transcripciones y detecta intención. Reemplaza SDR + capacitación.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: listas de leads + scripts</span>
+                        <span class="pill">Output: outcomes, next steps</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-sm">Cargar leads</a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-sm">Ver guiones</a>
+                        <a href="https://github.com/ArielSanroj/callagent" target="_blank" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Conectado.</div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="agent-card">
-                    <span class="status-badge status-idle">Idle</span>
-                    <h4>Customer Journey Agent</h4>
-                    <p>Monitors NPS, churn, and support response times to prioritize CX fixes.</p>
-                    <ul class="capability-list">
-                        <li>Churn prediction</li>
-                        <li>Support triage</li>
-                        <li>Retention playbooks</li>
-                    </ul>
+                    <span class="status-badge status-active">Activo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Repo: mailicpagent</span>
+                        <span class="agent-fact">CRM/Email</span>
+                    </div>
+                    <h4>CRM + Email</h4>
+                    <p><strong>Tu especialista en secuencias automáticas, scoring, buyer signals y follow-ups inteligentes.</strong> Reemplaza software CRM + personal CRM.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: leads/segmentos + playbooks</span>
+                        <span class="pill">Output: secuencias, follow-ups</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-sm">Conectar CRM</a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-sm">Ver flujo</a>
+                        <a href="https://github.com/ArielSanroj/mailicpagent" target="_blank" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Conectado.</div>
                 </div>
             </div>
+        </div>
+
+        <div class="row agent-tab d-none" data-agent-content="rrhh">
+            <div class="col-md-6">
+                <div class="agent-card">
+                    <span class="status-badge status-active">Activo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Repo: clioalphamodel</span>
+                        <span class="agent-fact">Psicometría</span>
+                    </div>
+                    <h4>RRHH — Clio Agent</h4>
+                    <p><strong>Tu psicómetra + People Analyst + detector de burnout.</strong> Evalúa equipos, carga modelos de riesgo y crea planes de retención. Reemplaza consultoría de clima y burnout.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: DB Clio + ML service</span>
+                        <span class="pill">Output: risk scenarios, acciones</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-sm">Conectar base Clio</a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-sm">Ver flujo RRHH</a>
+                        <a href="{{ url_for('main.clio_agent') }}" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Conectado · FastAPI (uvicorn backend.main:app).</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="agent-card">
+                    <span class="status-badge status-idle">Listo</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Interno</span>
+                        <span class="agent-fact">CrewAI</span>
+                    </div>
+                    <h4>HR Optimizer</h4>
+                    <p>Turnover, productividad y engagement con recomendaciones.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: métricas HR / headcount</span>
+                        <span class="pill">Output: planes de retención y training</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-primary btn-sm">Subir HR report</a>
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-outline-light btn-sm">Ver demo</a>
+                        <a href="https://github.com/ArielSanroj/clioalphamodel" target="_blank" class="btn btn-outline-primary btn-sm">Ir al agente</a>
+                    </div>
+                    <div class="agent-footnote">Estado: Listo para ejecutar.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row agent-tab d-none" data-agent-content="legal">
+            <div class="col-md-6">
+                <div class="agent-card">
+                    <span class="status-badge status-idle">Roadmap</span>
+                    <div class="agent-meta">
+                        <span class="agent-fact">Legal / Compliance</span>
+                        <span class="agent-fact">Planeado</span>
+                    </div>
+                    <h4>Compliance & Contracts</h4>
+                    <p>Revisión de contratos, KYC/AML y checklists regulatorias.</p>
+                    <div class="agent-meta">
+                        <span class="pill">Input: contratos / políticas</span>
+                        <span class="pill">Output: hallazgos, riesgos, próximos pasos</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-sm">Unirme a la lista</a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-sm">Solicitar piloto</a>
+                    </div>
+                    <div class="agent-footnote">Estado: En roadmap · deja tus datos para priorizar.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="background: var(--color-surface-alt); padding: 80px 0;">
+    <div class="container">
+        <h2 class="section-title text-center mb-3">Connected Agents by Area</h2>
+        <p class="lead text-center mb-4" style="max-width: 940px; margin: 0 auto; color: var(--color-text-secondary);">
+            Each agent is already wired as a module. Pick the area, connect credentials, and execute the playbook.
+        </p>
+        <div class="integration-grid">
+            <div class="integration-card">
+                <div class="integration-meta">
+                    <span class="pill active">Finanzas</span>
+                    <span class="pill">Alegra/NIIF</span>
+                </div>
+                <h5>Supervincent · Finanzas/Impuestos</h5>
+                <p>Analiza estados, calcula KPIs y valida impuestos. Entrada: P&L / balanza / facturas.</p>
+                <small>Repo: supervincent · Estado: Conectado</small>
+            </div>
+            <div class="integration-card">
+                <div class="integration-meta">
+                    <span class="pill active">Marketing</span>
+                    <span class="pill">TikTok Ads</span>
+                </div>
+                <h5>Marketingagentcompanies</h5>
+                <p>Optimiza campañas, presupuesto y creatividades en TikTok Ads. Entrada: credenciales + campañas.</p>
+                <small>Repo: marketingagentcompanies · Estado: Listo (ejecución pendiente)</small>
+            </div>
+            <div class="integration-card">
+                <div class="integration-meta">
+                    <span class="pill active">Marketing</span>
+                    <span class="pill">Google Ads</span>
+                </div>
+                <h5>Marketingagent</h5>
+                <p>Estructura cuentas, pujas y creatividades en Google Ads. Entrada: MCC/cliente + objetivos.</p>
+                <small>Repo: marketingagent · Estado: Conectado</small>
+            </div>
+            <div class="integration-card">
+                <div class="integration-meta">
+                    <span class="pill active">Ventas</span>
+                    <span class="pill">Outbound</span>
+                </div>
+                <h5>Callagent</h5>
+                <p>Gestiona campañas de llamadas, guiones y resultados. Entrada: listas de leads + scripts.</p>
+                <small>Repo: callagent · Estado: Conectado</small>
+            </div>
+            <div class="integration-card">
+                <div class="integration-meta">
+                    <span class="pill active">Marketing</span>
+                    <span class="pill">LinkedIn</span>
+                </div>
+                <h5>Linkedinposting</h5>
+                <p>Comenta posts según reglas de voz y compliance. Entrada: perfiles, posts, tono de marca.</p>
+                <small>Repo: linkedinposting · Estado: Conectado</small>
+            </div>
+            <div class="integration-card">
+                <div class="integration-meta">
+                    <span class="pill active">Ventas</span>
+                    <span class="pill">CRM/Email</span>
+                </div>
+                <h5>Mailicpagent</h5>
+                <p>Secuencias de email, scoring y cadencias. Entrada: leads/segmentos + playbooks.</p>
+                <small>Repo: mailicpagent · Estado: Conectado</small>
+            </div>
+            <div class="integration-card">
+                <div class="integration-meta">
+                    <span class="pill active">RRHH</span>
+                    <span class="pill">Psicometría</span>
+                </div>
+                <h5>Clio Alpha</h5>
+                <p>Analiza arquetipos y riesgos de equipo vía FastAPI. Entrada: DB Clio + ML service.</p>
+                <small>Repo: clioalphamodel · Estado: Conectado</small>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.upload') }}" class="btn btn-primary">Activar agente ahora</a>
+            <a href="{{ url_for('main.questionnaire') }}" class="btn btn-outline-light">Ver flujo completo</a>
         </div>
     </div>
 </section>
@@ -542,32 +1399,244 @@
 
 <section style="padding: 80px 0;">
     <div class="container">
-        <h2 class="section-title text-center mb-4">Teams Already Using AstraMech</h2>
+        <h2 class="section-title text-center mb-4">Equipos que Ya Usan Astramech</h2>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="testimonial-card">
-                    <p>"Financial review went from two weeks to two hours. The diagnostic agent flagged a 12% margin leak we missed for months."</p>
-                    <strong>María Fernanda · CFO, Retail</strong>
+                <div class="testimonial-card-enhanced">
+                    <div class="testimonial-header">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem;">MF</div>
+                        <div>
+                            <h5>María Fernanda</h5>
+                            <p class="testimonial-role" style="color: var(--color-text-secondary); font-size: 0.9rem; margin: 0;">CFO, Retail</p>
+                        </div>
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">
+                        "La revisión financiera pasó de dos semanas a dos horas. El agente detectó una fuga del 12% de margen que nosotros no vimos. Es mejor que contratar."
+                    </p>
+                    <div class="testimonial-metrics">
+                        <span class="metric-badge">
+                            <i class="fas fa-clock"></i> 2 semanas → 2 horas
+                        </span>
+                        <span class="metric-badge">
+                            <i class="fas fa-chart-line"></i> +12% margen detectado
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="testimonial-card">
-                    <p>"HR optimizer built a retention plan based on payroll data. We now monitor turnover weekly without spreadsheets."</p>
-                    <strong>Daniel López · HR Director, Manufacturing</strong>
+                <div class="testimonial-card-enhanced">
+                    <div class="testimonial-header">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem;">DL</div>
+                        <div>
+                            <h5>Daniel López</h5>
+                            <p class="testimonial-role" style="color: var(--color-text-secondary); font-size: 0.9rem; margin: 0;">HR Director, Manufacturing</p>
+                        </div>
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">
+                        "El optimizador de RRHH armó un plan de retención sin consultores. No hemos vuelto a usar hojas de cálculo. No necesitamos contratar más personal."
+                    </p>
+                    <div class="testimonial-metrics">
+                        <span class="metric-badge">
+                            <i class="fas fa-chart-bar"></i> Monitoreo semanal
+                        </span>
+                        <span class="metric-badge">
+                            <i class="fas fa-users"></i> Plan de retención
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="testimonial-card">
-                    <p>"IT and Ops share the same KPI radar. Productivity indexes update whenever we upload Jira exports."</p>
-                    <strong>Ana Ruiz · COO, SaaS</strong>
+                <div class="testimonial-card-enhanced">
+                    <div class="testimonial-header">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem;">AR</div>
+                        <div>
+                            <h5>Ana Ruiz</h5>
+                            <p class="testimonial-role" style="color: var(--color-text-secondary); font-size: 0.9rem; margin: 0;">COO, SaaS</p>
+                </div>
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">
+                        "Ahora IT y Ops comparten el mismo radar de KPIs. Todo se actualiza automático cuando subimos datos. Es como tener un equipo completo sin contratar."
+                    </p>
+                    <div class="testimonial-metrics">
+                        <span class="metric-badge">
+                            <i class="fas fa-sync"></i> Actualización automática
+                        </span>
+                        <span class="metric-badge">
+                            <i class="fas fa-tachometer-alt"></i> KPIs unificados
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- FAQ Section -->
+<section class="faq-section" style="background: var(--color-surface-alt);">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Preguntas Frecuentes</h2>
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                ¿Mis datos están seguros?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Sí. Astramech funciona 100% on-premise. Tus datos nunca salen de tu entorno. 
+                                Opcionalmente puedes usar Pinecone con encriptación end-to-end para memoria persistente.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                ¿Cuánto tiempo toma ver resultados?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Desde que subes tus archivos hasta que recibes recomendaciones accionables, el proceso toma menos de 5 minutos. 
+                                El análisis de KPIs es instantáneo y los agentes de IA generan recomendaciones en tiempo real.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                ¿Qué tipos de archivos puedo subir?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Aceptamos Excel (.xlsx, .xls), CSV y PDF. El parser universal entiende formatos NIIF, GAAP y hojas de cálculo desordenadas. 
+                                Puedes subir P&L, balances, reportes de HR, trackers operacionales y más.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                ¿Necesito instalar algo?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Para uso local, necesitas Ollama instalado. El sistema funciona completamente on-premise con CrewAI y Ollama. 
+                                No se requieren servicios en la nube ni suscripciones externas para el funcionamiento básico.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                ¿Puedo usar múltiples agentes a la vez?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Sí. Astramech está diseñado para ejecutar múltiples agentes simultáneamente. El agente diagnostic coordina 
+                                las recomendaciones de todos los agentes especializados (Finanzas, HR, Marketing, Ventas) para darte una visión 
+                                integral de tu negocio.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Logos Section -->
+<section class="logos-section">
+    <div class="container">
+        <p class="text-center mb-4" style="color: var(--color-text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em;">
+            Trusted by teams in Finance, HR, Retail, SaaS
+        </p>
+        <div class="logos-grid">
+            <div class="logo-item">Finance</div>
+            <div class="logo-item">Retail</div>
+            <div class="logo-item">SaaS</div>
+            <div class="logo-item">Manufacturing</div>
+            <div class="logo-item">Healthcare</div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section - Nuevo Mensaje -->
+<section class="cta-section" style="padding: var(--spacing-section) 0;">
+    <div class="container text-center">
+        <h2 class="text-white mb-3" style="font-size: 36px; font-weight: 600;">
+            Automatiza tu negocio sin contratar más personas
+        </h2>
+        <p class="text-white mb-4" style="max-width: 600px; margin: 0 auto; font-size: 1.1rem; opacity: 0.9;">
+            Activa agentes IA listos en 5 minutos
+        </p>
+        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-light btn-lg" style="padding: 16px 40px; font-size: 1.1rem;">
+            Probar Gratis
+        </a>
+        <p class="text-white-50 mt-4" style="font-size: 0.9rem;">
+            Sin tarjeta · On-premise · Tus datos nunca salen
+        </p>
+    </div>
+</section>
+
+<!-- CTA Sticky Mobile -->
+<div class="cta-sticky-mobile">
+    <div class="container">
+        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary w-100" style="padding: 14px;">
+            Activar agente (Gratis)
+        </a>
+    </div>
+</div>
+
+
+<!-- Modal para Demo Video -->
+<div class="modal fade" id="demo-video" tabindex="-1" aria-labelledby="demoVideoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: var(--color-surface); border: 1px solid rgba(123, 97, 255, 0.2);">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(123, 97, 255, 0.1);">
+                <h5 class="modal-title" id="demoVideoLabel">Demo de Astramech</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="ratio ratio-16x9">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Astramech Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <p class="mt-3 text-center" style="color: var(--color-text-secondary);">
+                    <small>Video demo de 2 minutos mostrando cómo Astramech analiza tus datos y activa agentes especializados</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+    // Tab switching para agentes
     document.querySelectorAll('.tab-buttons button').forEach(button => {
         button.addEventListener('click', () => {
             document.querySelectorAll('.tab-buttons button').forEach(btn => btn.classList.remove('active'));
@@ -579,7 +1648,150 @@
                     tab.classList.remove('d-none');
                 }
             });
+            
+            // Track event
+            if (window.gtag) {
+                gtag('event', 'agent_tab_click', {
+                    event_category: 'engagement',
+                    event_label: target
+                });
+            }
         });
     });
+
+    // Analytics mejorado
+    document.addEventListener('DOMContentLoaded', function() {
+        // Track scroll depth
+        let maxScroll = 0;
+        const scrollThresholds = [25, 50, 75, 90];
+        const trackedThresholds = new Set();
+        
+        window.addEventListener('scroll', function() {
+            const scrollPercent = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+            if (scrollPercent > maxScroll) {
+                maxScroll = scrollPercent;
+                scrollThresholds.forEach(threshold => {
+                    if (scrollPercent >= threshold && !trackedThresholds.has(threshold)) {
+                        trackedThresholds.add(threshold);
+                        if (window.gtag) {
+                            gtag('event', 'scroll_' + threshold, { 
+                                event_category: 'engagement',
+                                value: threshold
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+        // Track time on page
+        let startTime = Date.now();
+        window.addEventListener('beforeunload', function() {
+            const timeSpent = Math.round((Date.now() - startTime) / 1000);
+            if (window.gtag && timeSpent > 10) {
+                gtag('event', 'time_on_page', {
+                    event_category: 'engagement',
+                    value: timeSpent
+                });
+            }
+        });
+
+        // Track CTA clicks
+        document.querySelectorAll('a.btn-primary, a.btn-outline-primary, a.btn-outline-light').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (window.gtag) {
+                    gtag('event', 'cta_click', {
+                        event_category: 'conversion',
+                        event_label: this.textContent.trim(),
+                        value: 1
+                    });
+                }
+            });
+        });
+
+        // Smooth scroll para anchors
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+        
+        // Testimonials Slider
+        const slides = document.querySelectorAll('.testimonial-slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        let currentSlide = 0;
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+        
+        if (dots.length > 0) {
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentSlide = index;
+                    showSlide(currentSlide);
+                });
+            });
+            
+            // Auto-advance slider
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }, 5000);
+        }
+    });
+
+    // Animación de números (contador)
+    function animateCounter(element, target, duration = 2000) {
+        let start = 0;
+        const increment = target / (duration / 16);
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+                element.textContent = Math.floor(target) + '+';
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(start) + '+';
+            }
+        }, 16);
+    }
+
+    // Iniciar animación cuando el elemento sea visible
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target.querySelector('#live-counter');
+                if (counter && !counter.dataset.animated) {
+                    counter.dataset.animated = 'true';
+                    animateCounter(counter, 221);
+                }
+            }
+        });
+    }, observerOptions);
+
+    const heroSection = document.querySelector('.hero-section');
+    if (heroSection) {
+        observer.observe(heroSection);
+    }
 </script>
 {% endblock %}

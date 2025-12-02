@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Clio Alpha · RRHH{% endblock %}
+{% block content %}
+<section class="hero-section" style="padding: 70px 0;">
+  <div class="container">
+    <div class="d-flex justify-content-between flex-wrap align-items-start gap-4 mb-4">
+      <div>
+        <div class="badge-pill mb-3"><i class="fas fa-heartbeat"></i> Clio Alpha · RRHH</div>
+        <h1 class="hero-title" style="font-size: 40px;">Psicometría y riesgo de equipo en vivo</h1>
+        <p class="hero-subtitle" style="max-width: 720px;">Clio Alpha analiza arquetipos, dinámicas de riesgo y recomendaciones críticas. Ejecuta en tu red con integraciones de base de datos y ML.</p>
+        <div class="hero-cta">
+          <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary btn-lg">Evaluar equipo</a>
+          <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-lg">Subir datos Clio</a>
+        </div>
+        <p class="lead mt-3" id="clio-status">Estado del sistema: cargando...</p>
+      </div>
+      <div>
+        <a href="https://github.com/ArielSanroj/clioalphamodel" target="_blank" class="btn btn-outline-primary">Ver implementación</a>
+      </div>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="stat-card">
+          <h3>Miembros</h3>
+          <p class="display-5" id="clio-members">0</p>
+          <small id="clio-team-name">Equipo</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <h3>Viabilidad</h3>
+          <p class="display-5" id="clio-viability">0%</p>
+          <small>Score general</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <h3>Arquetipos</h3>
+          <p class="display-5" id="clio-archetypes">0</p>
+          <small>Distintos perfiles</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <h3>Riesgos</h3>
+          <p class="display-5" id="clio-risk-count">0</p>
+          <small>Escenarios críticos</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-5">
+      <div class="col-md-4">
+        <button id="clio-refresh" class="btn btn-primary w-100">Actualizar insights</button>
+      </div>
+      <div class="col-md-4">
+        <button id="clio-analyze" class="btn btn-outline-light w-100">Re-analizar team</button>
+      </div>
+      <div class="col-md-4">
+        <span class="badge-pill">FastAPI · On-prem</span>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-md-6">
+        <div class="recommendation-card">
+          <h4>Composición del equipo</h4>
+          <ul id="clio-composition" class="capability-list"><li>Cargando composición...</li></ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="recommendation-card">
+          <h4>Riesgos detectados</h4>
+          <ul id="clio-risks" class="capability-list"><li>Cargando riesgos...</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendation-card">
+      <h4>Recomendaciones</h4>
+      <ul id="clio-recommendations" class="capability-list"><li>Esperando análisis...</li></ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  const statusUrl = "{{ url_for('main.clio_status') }}";
+  const analyzeUrl = "{{ url_for('main.clio_analyze') }}";
+
+  const setText = (id, value) => { const el = document.getElementById(id); if(el) el.textContent = value; };
+
+  const renderList = (id, items) => {
+    const container = document.getElementById(id);
+    if(!container) return;
+    if(!items || !items.length) {
+      container.innerHTML = '<li>No hay datos.</li>';
+      return;
+    }
+    container.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+  };
+
+  const renderComposition = (composition = {}) => {
+    const entries = Object.entries(composition);
+    if(!entries.length) {
+      renderList('clio-composition', ['Sin composición definida']);
+      return;
+    }
+    renderList('clio-composition', entries.map(([archetype, pct]) => `${archetype}: ${(pct * 100).toFixed(1)}%`));
+    setText('clio-archetypes', entries.length);
+  };
+
+  const renderRiskScenarios = (scenarios = []) => {
+    renderList('clio-risks', scenarios.map(s => `${s.scenario} · ${s.level}`));
+    setText('clio-risk-count', scenarios.length);
+  };
+
+  const renderRecommendations = (list = []) => {
+    renderList('clio-recommendations', list.map(r => `${r.priority.toUpperCase()}: ${r.description}`));
+  };
+
+  const refreshData = async () => {
+    setText('clio-status', 'Estado del sistema: cargando...');
+    try {
+      const response = await fetch(statusUrl);
+      const data = await response.json();
+      const overview = data.overview;
+      const risk = data.risk;
+      setText('clio-status', `Estado del sistema: ${overview.system} · ${overview.components.financial_analyzer}`);
+      setText('clio-team-name', overview.teamName || 'Equipo');
+      setText('clio-members', overview.members?.length || 0);
+      setText('clio-viability', `${risk.viabilityScore || 0}%`);
+      setText('clio-members', overview.members?.length || 0);
+      renderComposition(risk.composition);
+      renderRiskScenarios(risk.riskScenarios || []);
+      renderRecommendations(risk.recommendations || []);
+    } catch (error) {
+      setText('clio-status', 'Estado del sistema: no disponible');
+    }
+  };
+
+  const reanalyze = async () => {
+    try {
+      const members = []; // placeholder; could collect from UI
+      const response = await fetch(analyzeUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ members }),
+      });
+      const data = await response.json();
+      setText('clio-viability', `${data.viabilityScore || 0}%`);
+      renderRecommendations(data.recommendations || []);
+    } catch (error) {
+      renderRecommendations([{ priority: 'error', description: error.message }]);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    refreshData();
+    document.getElementById('clio-refresh')?.addEventListener('click', refreshData);
+    document.getElementById('clio-analyze')?.addEventListener('click', reanalyze);
+  });
+</script>
+{% endblock %}

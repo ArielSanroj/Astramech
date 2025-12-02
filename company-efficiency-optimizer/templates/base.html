@@ -27,6 +27,7 @@
     <style>
         :root {
             --color-bg: #0B1120;
+            --color-bg-gradient: linear-gradient(180deg, #0d0d15 0%, #0b0b12 100%);
             --color-surface: #141B35;
             --color-surface-alt: #111831;
             --color-bg-alt: #0F1427;
@@ -35,16 +36,15 @@
             --color-primary: #7B61FF;
             --color-primary-hover: #9D7CFF;
             --color-secondary: #00C8FF;
-            --color-primary-gradient: linear-gradient(135deg, #9D7CFF 0%, #6C4DFF 100%);
-            --color-secondary-gradient: linear-gradient(135deg, #7B61FF 0%, #00C8FF 100%);
             --color-highlight: #FFB020;
             --color-danger: #FF5555;
             --color-secondary-bg: #2D2F48;
-            --radius-md: 12px;
-            --shadow-soft: 0 0 20px rgba(123, 97, 255, 0.1);
-            --shadow-strong: 0 8px 30px rgba(123, 97, 255, 0.2);
-            --spacing-section: 100px;
+            --radius-md: 8px;
+            --spacing-section: 96px;
+            --spacing-section-large: 128px;
         }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
         
         * {
             transition: all 0.3s ease-in-out;
@@ -61,25 +61,27 @@
         
         /* Jerarquía tipográfica optimizada */
         h1 {
-            font-family: 'Poppins', 'Manrope', sans-serif;
-            font-size: 56px;
-            font-weight: 700;
-            line-height: 1.2;
+            font-family: 'Sora', 'Inter', sans-serif;
+            font-size: 42px;
+            font-weight: 600;
+            line-height: 1.3;
             color: var(--color-text-primary);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
         }
         
         h2 {
-            font-family: 'Poppins', 'Manrope', sans-serif;
-            font-size: 36px;
-            font-weight: 700;
+            font-family: 'Sora', 'Inter', sans-serif;
+            font-size: 32px;
+            font-weight: 600;
             line-height: 1.3;
             color: var(--color-text-primary);
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
         }
         
         h3 {
-            font-family: 'Poppins', 'Manrope', sans-serif;
+            font-family: 'Sora', 'Inter', sans-serif;
             font-size: 24px;
             font-weight: 600;
             line-height: 1.4;
@@ -88,9 +90,13 @@
         }
         
         h4, h5, h6 {
-            font-family: 'Poppins', 'Manrope', sans-serif;
+            font-family: 'Sora', 'Inter', sans-serif;
             font-weight: 600;
             color: var(--color-text-primary);
+        }
+        
+        .number-kpi {
+            font-family: 'JetBrains Mono', monospace;
         }
         
         p, li, span {
@@ -105,9 +111,15 @@
         
         .navbar-brand {
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             color: var(--color-primary) !important;
-            letter-spacing: 0.5px;
+            letter-spacing: -0.02em;
+            padding: 0.5rem 0 !important;
+        }
+        
+        .navbar-brand i {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
         }
         
         .nav-link {
@@ -119,19 +131,17 @@
         }
         
         .btn-primary {
-            background: var(--color-primary-gradient);
+            background: var(--color-primary);
             border: none;
             color: white;
             font-weight: 600;
-            padding: 12px 30px;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-soft);
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-size: 1rem;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #9D7CFF 0%, #7B61FF 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(123, 97, 255, 0.3);
+            background: var(--color-primary-hover);
         }
         
         .btn-outline-primary {
@@ -152,14 +162,12 @@
         .card {
             background: var(--color-surface);
             border: 1px solid rgba(123, 97, 255, 0.1);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-soft);
+            border-radius: 8px;
             color: var(--color-text-primary);
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(123, 97, 255, 0.2);
+            border-color: rgba(123, 97, 255, 0.3);
         }
         
         .text-muted {
@@ -260,26 +268,6 @@
             border-color: rgba(123, 97, 255, 0.1) !important;
         }
         
-        /* CTA Flotante Persistente */
-        .floating-cta {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-            animation: pulse 2s infinite;
-        }
-        
-        .floating-cta .btn {
-            box-shadow: 0 4px 20px rgba(123, 97, 255, 0.4);
-            padding: 16px 32px;
-            font-size: 1rem;
-            font-weight: 700;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
         
         /* Espaciado de secciones */
         section {
@@ -405,8 +393,8 @@
     <a class="skip-link" href="#main">Saltar al contenido</a>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation" aria-label="Principal">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-robot me-2"></i>AstraMech
+            <a class="navbar-brand" href="{{ url_for('main.index') }}" style="font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; padding: 0.5rem 0;">
+                <i class="fas fa-robot me-2" style="font-size: 1.5rem;"></i>Astramech
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -428,36 +416,17 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- CTA Flotante Persistente -->
-    <div class="floating-cta" role="complementary" aria-label="Call to action">
-        <a href="{{ url_for('main.questionnaire') }}" class="btn btn-primary" aria-label="Get Started with AstraMech">
-            <i class="fas fa-rocket me-2"></i>Get Started
-        </a>
-    </div>
 
-    <footer class="py-5 mt-5" role="contentinfo">
+    <footer class="py-4 mt-5" role="contentinfo">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="fw-bold mb-3">AstraMech</h5>
-                    <p class="text-muted mb-0">AI-powered business optimization for every department. Multi-agent system built with CrewAI, Ollama, and Pinecone to transform organizational performance.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="fw-bold mb-3">Resources</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-muted"><i class="fas fa-file-alt me-2"></i>API Documentation</a></li>
-                        <li class="mb-2"><a href="#" class="text-muted"><i class="fab fa-github me-2"></i>GitHub Repository</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="fw-bold mb-3">Contact</h5>
-                    <p class="mb-2"><a href="mailto:support@astramech.ai" class="text-muted"><i class="fas fa-envelope me-2"></i>support@astramech.ai</a></p>
-                    <p class="mb-0 text-muted">Powered by CrewAI • Ollama • Pinecone</p>
-                </div>
+            <div class="footer-links">
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+                <a href="https://github.com/ArielSanroj" target="_blank">GitHub</a>
             </div>
-            <hr class="my-4">
             <div class="text-center">
-                <p class="mb-0 text-muted">&copy; 2025 AstraMech. All rights reserved.</p>
+                <p class="mb-0" style="color: var(--color-text-secondary); font-size: 0.85rem;">&copy; 2025 Astramech. All rights reserved.</p>
             </div>
         </div>
     </footer>

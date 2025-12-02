@@ -51,7 +51,9 @@ def create_app(config_name=None):
     app.logger.info('Company Efficiency Optimizer startup')
     
     # Initialize extensions
-    Session(app)
+    # Only initialize Flask-Session if not using built-in sessions
+    if app.config.get('SESSION_TYPE') and app.config.get('SESSION_TYPE') != 'null':
+        Session(app)
     
     # Register error handlers
     register_error_handlers(app)
