@@ -62,3 +62,8 @@ htmlcov/
 
 # Vercel
 .vercel
+
+# Ngrok
+ngrok_config.yml
+flask.log
+*.ngrok.yml

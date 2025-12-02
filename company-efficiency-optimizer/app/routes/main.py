@@ -3,7 +3,10 @@ Main routes for the Company Efficiency Optimizer
 """
 
 from flask import Blueprint, render_template, redirect, url_for, flash, session
-from flask import current_app, send_from_directory, Response
+from flask import current_app, send_from_directory, Response, jsonify, request
+# new imports
+from app.services.supervincent_service import SuperVincentService
+from app.services.clio_service import ClioService
 from app.utils.export import export_results_to_csv, export_results_to_json
 # from app.services.analysis_service import AnalysisService
 # from app.utils.validators import validate_questionnaire_data
@@ -114,3 +117,43 @@ def export_json():
         mimetype='application/json',
         headers={'Content-Disposition': f'attachment; filename=astramech-analysis-{results.get("company_name", "report")}.json'}
     )
+
+
+@main_bp.route('/agents/supervincent')
+def supervincent_agent():
+    """SuperVincent financial agent landing."""
+    return render_template('agents/supervincent.html')
+
+
+@main_bp.route('/agents/supervincent/status')
+def supervincent_status():
+    service = SuperVincentService()
+    return jsonify(service.get_status())
+
+
+@main_bp.route('/agents/supervincent/run', methods=['POST'])
+def supervincent_run():
+    service = SuperVincentService()
+    result = service.run_analysis()
+    return jsonify(result)
+
+
+@main_bp.route('/agents/clioalpha')
+def clio_agent():
+    return render_template('agents/clioalpha.html')
+
+
+@main_bp.route('/agents/clioalpha/status')
+def clio_status():
+    service = ClioService()
+    overview = service.get_team_overview()
+    risk = service.get_risk_analysis()
+    return jsonify({"overview": overview, "risk": risk})
+
+
+@main_bp.route('/agents/clioalpha/analyze', methods=['POST'])
+def clio_analyze():
+    service = ClioService()
+    payload = request.get_json(force=True, silent=True) or {}
+    members = payload.get("members") or {}
+    return jsonify(service.analyze_composition(members))

@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block title %}SuperVincent • Financiero{% endblock %}
+{% block content %}
+<section class="hero-section" style="padding: 80px 0;">
+  <div class="container">
+    <div class="d-flex justify-content-between flex-wrap align-items-center mb-4">
+      <div>
+        <div class="badge-pill mb-3"><i class="fas fa-bolt"></i> SuperVincent • Financiero</div>
+        <h1 class="hero-title" style="font-size: 42px;">Dashboard financiero en tiempo real</h1>
+        <p class="hero-subtitle" style="max-width: 760px;">Analiza estados, KPIs y obligaciones en un solo lugar. On-prem, credenciales por cliente, integrado con NIIF/Alegra.</p>
+        <div class="hero-cta">
+          <a href="{{ url_for('main.upload') }}" class="btn btn-primary btn-lg">Subir soporte contable</a>
+          <a href="{{ url_for('main.upload') }}" class="btn btn-outline-light btn-lg">Carga masiva</a>
+          <a href="{{ url_for('main.upload') }}" class="btn btn-outline-primary btn-lg">Crear factura</a>
+        </div>
+        <p class="lead mt-3" id="sv-system-status">Estado del sistema: cargando...</p>
+      </div>
+      <div class="text-end">
+        <a href="https://github.com/ArielSanroj/supervincent" class="btn btn-outline-primary" target="_blank">Ver repositorio</a>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-3"><button class="btn btn-primary w-100" id="sv-run">Actualizar</button></div>
+      <div class="col-md-3"><button class="btn btn-outline-light w-100">Subir Soporte Contable</button></div>
+      <div class="col-md-3"><button class="btn btn-outline-light w-100">Carga Masiva</button></div>
+      <div class="col-md-3"><button class="btn btn-outline-light w-100">Crear Factura</button></div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <h3>Liquidez</h3>
+          <p class="display-6"><span id="sv-liquidity">0%</span></p>
+          <small id="sv-liquidity-footnote">Estado: zona de pérdida</small>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <h3>Ventas mes</h3>
+          <p class="display-6"><span id="sv-sales">$ 0</span></p>
+          <small>Ingresos actualizados</small>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <h3>Utilidad mes</h3>
+          <p class="display-6"><span id="sv-profit">$ 0</span></p>
+          <small>Resultado neto</small>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <h3>Rotación inventario</h3>
+          <p class="display-6"><span id="sv-inventory">0 días</span></p>
+          <small>Rotación mensual</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-md-6">
+        <div class="workflow-step">
+          <span>Indicadores financieros</span>
+          <ul class="capability-list">
+            <li>Contabilidad: Endeudamiento <span id="sv-debt">0%</span>, Liquidez <span id="sv-liquidity-detail">0</span></li>
+            <li>Ventas mes: <span id="sv-sales-detail">$0</span> · Utilidad mes: <span id="sv-profit-detail">$0</span></li>
+            <li>Rotación inventario: <span id="sv-inventory-detail">0 días</span> · Caja disponible: <span id="sv-cash">$0</span></li>
+          </ul>
+        </div>
+        </div>
+        <div class="col-md-6">
+          <div class="workflow-step">
+            <span>Impuestos</span>
+            <ul class="capability-list">
+            <li>ReteICA: <span id="sv-reteica">$0</span></li>
+            <li>ReteIVA: <span id="sv-reteiva">$0</span></li>
+            <li>ReteRenta: <span id="sv-reterenta">$0</span></li>
+            </ul>
+          </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-md-6">
+        <div class="workflow-step">
+          <span>Presupuesto</span>
+          <p><span id="sv-budget-cats">0</span> categorías</p>
+          <p>📊 <span id="sv-budget-note">Sin datos de presupuesto</span></p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="workflow-step">
+          <span>Punto de equilibrio</span>
+          <p>Indicador de rentabilidad actual</p>
+          <p><strong>0% · Zona de Pérdida</strong></p>
+          <p>⚠️ Atención: El negocio está en zona de pérdida. Revisar estrategias.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendation-card">
+      <h4>Busquemos estrategias financieras</h4>
+      <ul class="capability-list" id="sv-recommendations">
+        <li>Cargando recomendaciones...</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  const statusUrl = "{{ url_for('main.supervincent_status') }}";
+  const runUrl = "{{ url_for('main.supervincent_run') }}";
+  const updateButton = document.getElementById('sv-run');
+
+  const formatCurrency = (value) => {
+    if (!value && value !== 0) return '$ 0';
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+  };
+
+  const formatPercent = (value) => {
+    if (typeof value !== 'number') return '0%';
+    return `${(value * 100).toFixed(1)}%`;
+  };
+
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
+
+  const updateMetrics = (metrics = {}) => {
+    const kpis = metrics.kpis || {};
+    setText('sv-liquidity', formatPercent(kpis.current_ratio));
+    setText('sv-liquidity-footnote', kpis.current_ratio < 1 ? 'Zona de pérdida detectada' : 'Liquidez saludable');
+    setText('sv-debt', `${(kpis.deuda_patrimonio || 0).toFixed(2)}x`);
+    setText('sv-liquidity-detail', kpis.current_ratio?.toFixed(2) || '0');
+    setText('sv-sales', formatCurrency(metrics.ingresos));
+    setText('sv-sales-detail', formatCurrency(metrics.ingresos));
+    setText('sv-profit', formatCurrency(kpis.utilidad_neta));
+    setText('sv-profit-detail', formatCurrency(kpis.utilidad_neta));
+    setText('sv-inventory', `${(kpis.rotacion_inventarios || 0).toFixed(1)} días`);
+    setText('sv-inventory-detail', `${(kpis.rotacion_inventarios || 0).toFixed(1)} días`);
+    const cashAvailable = (kpis.activos_corrientes || 0) - (kpis.pasivos_corrientes || 0);
+    setText('sv-cash', formatCurrency(cashAvailable));
+    setText('sv-reteica', formatCurrency(metrics.reteica || 0));
+    setText('sv-reteiva', formatCurrency(metrics.reteiva || 0));
+    setText('sv-reterenta', formatCurrency(metrics.reterenta || 0));
+    setText('sv-budget-cats', metrics.budget_categories || 0);
+    setText('sv-budget-note', metrics.budget_note || 'Sin datos de presupuesto');
+  };
+
+  const updateRecommendations = (recommendations = []) => {
+    const list = document.getElementById('sv-recommendations');
+    if (!list) return;
+    if (!recommendations.length) {
+      list.innerHTML = '<li>Sin recomendaciones disponibles.</li>';
+      return;
+    }
+    list.innerHTML = recommendations.map(item => `<li>${item}</li>`).join('');
+  };
+
+  const refreshStatus = async () => {
+    try {
+      const response = await fetch(statusUrl);
+      if (!response.ok) throw new Error('No se pudo cargar el estado');
+      const data = await response.json();
+      setText('sv-system-status', `Estado del sistema: ${data.system} · ${data.financial_files.latest_detected ? 'Archivo detectado' : 'No se detectó archivo'}`);
+    } catch (error) {
+      setText('sv-system-status', 'Estado del sistema: no disponible');
+    }
+  };
+
+  const triggerRun = async () => {
+    if (!updateButton) return;
+    updateButton.disabled = true;
+    const originalText = updateButton.textContent;
+    updateButton.textContent = 'Actualizando…';
+    try {
+      const response = await fetch(runUrl, { method: 'POST' });
+      const data = await response.json();
+      if (response.ok && data.metrics) {
+        updateMetrics(data.metrics);
+        updateRecommendations(data.recommendations);
+      } else {
+        updateRecommendations(data.recommendations || []);
+      }
+    } catch (error) {
+      updateRecommendations([`Error actualizando: ${error.message}`]);
+    } finally {
+      updateButton.disabled = false;
+      updateButton.textContent = originalText;
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    refreshStatus();
+    updateButton?.addEventListener('click', triggerRun);
+  });
+</script>
+{% endblock %}

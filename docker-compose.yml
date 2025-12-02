@@ -1,0 +1,310 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: astramech
+      POSTGRES_USER: astramech
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U astramech"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  api-gateway:
+    build:
+      context: api_gateway
+      dockerfile: Dockerfile
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: ${DATABASE_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      REDIS_URL: ${REDIS_URL}
+      # Service URLs
+      FINANCE_SERVICE_URL: ${FINANCE_SERVICE_URL:-http://finance-supervincent:8000}
+      HR_SERVICE_URL: ${HR_SERVICE_URL:-http://clio-hr-backend:3000}
+      GOOGLE_ADS_SERVICE_URL: ${GOOGLE_ADS_SERVICE_URL:-http://marketing-googleads:8080}
+      TIKTOK_SERVICE_URL: ${TIKTOK_SERVICE_URL:-http://marketing-tiktok:8002}
+      LINKEDIN_SERVICE_URL: ${LINKEDIN_SERVICE_URL:-http://linkedin-posting:8001}
+      CRM_SERVICE_URL: ${CRM_SERVICE_URL:-http://crm-email:5000}
+      CALLS_SERVICE_URL: ${CALLS_SERVICE_URL:-http://cold-calling:8000}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+
+  astramech-orchestrator:
+    build:
+      context: astramech-orchestrator
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      DATABASE_URL: ${DATABASE_URL}
+      API_GATEWAY_URL: ${API_GATEWAY_URL:-http://api-gateway:8000}
+      HR_SERVICE_URL: ${HR_SERVICE_URL:-http://clio-hr-backend:3000}
+      FINANCE_SERVICE_URL: ${FINANCE_SERVICE_URL:-http://finance-supervincent:8000}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://localhost:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+    volumes:
+      - ./shared:/app/shared
+    depends_on:
+      - api-gateway
+      - rabbitmq
+      - clio-hr-backend
+      - finance-supervincent
+      - marketing-googleads
+      - marketing-tiktok
+      - linkedin-posting
+      - crm-email
+      - cold-calling
+
+  finance-supervincent:
+    build:
+      context: agents/finance_supervincent  # Symlink a external_repos/supervincent
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://astramech:secret@postgres:5432/astramech}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      ALEGRA_EMAIL: ${ALEGRA_EMAIL}
+      ALEGRA_TOKEN: ${ALEGRA_TOKEN}
+      CELERY_RESULT_BACKEND: ${REDIS_URL:-redis://redis:6379/0}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    volumes:
+      - ./agents/finance_supervincent/uploads:/app/uploads  # Symlink a external_repos/supervincent/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  clio-hr-backend:
+    build:
+      context: agents/hr_clio/backend  # Symlink a external_repos/clioalphamodel/backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL:-postgresql://astramech:secret@postgres:5432/astramech}
+      ML_SERVICE_URL: ${ML_SERVICE_URL:-http://clio-hr-ml-service:8001}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      clio-hr-ml-service:
+        condition: service_started
+    volumes:
+      - ./agents/hr_clio/backend:/app  # Symlink a external_repos/clioalphamodel/backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  clio-hr-ml-service:
+    build:
+      context: agents/hr_clio/ml-service  # Symlink a external_repos/clioalphamodel/ml-service
+      dockerfile: Dockerfile
+    environment:
+      PORT: 8001
+      MODEL_PATH: /app/models/burnout_model.pkl
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+    ports:
+      - "8001:8001"
+    depends_on:
+      redis:
+        condition: service_started
+    volumes:
+      - ./agents/hr_clio/ml-service/models:/app/models  # Symlink a external_repos/clioalphamodel/ml-service/models
+      - ./agents/hr_clio/ml-service/data:/app/data  # Symlink a external_repos/clioalphamodel/ml-service/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  marketing-googleads:
+    build:
+      context: agents/marketing_googleads  # Symlink a external_repos/marketingagent
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://astramech:secret@postgres:5432/astramech}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/performance"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  marketing-tiktok:
+    build:
+      context: agents/marketing_tiktok  # Symlink a external_repos/marketingagentcompanies
+      dockerfile: Dockerfile
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://localhost:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+    ports:
+      - "8002:8002"
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  linkedin-posting:
+    build:
+      context: agents/linkedinposting  # Symlink a external_repos/linkedinposting
+      dockerfile: Dockerfile
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+    ports:
+      - "8003:8001"
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    volumes:
+      - ./agents/linkedinposting/browser/storage:/app/browser/storage  # Symlink a external_repos/linkedinposting/browser/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  crm-email:
+    build:
+      context: agents/crm_email  # Symlink a external_repos/mailicpagent
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:///crm.db}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      GMAIL_CREDENTIALS_PATH: /app/config/gmail_credentials.json
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://localhost:11434}
+    ports:
+      - "5000:5000"
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    volumes:
+      - ./agents/crm_email/data:/app/data  # Symlink a external_repos/mailicpagent/data
+      - ./agents/crm_email/config:/app/config  # Symlink a external_repos/mailicpagent/config
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  cold-calling:
+    build:
+      context: agents/outbound_calling  # Symlink a external_repos/callagent
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://astramech:secret@postgres:5432/astramech}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - "8004:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      minio:
+        condition: service_started
+    volumes:
+      - ./agents/outbound_calling/uploads:/app/uploads  # Symlink a external_repos/callagent/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

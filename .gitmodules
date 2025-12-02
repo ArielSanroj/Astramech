@@ -1,0 +1,21 @@
+[submodule "external_repos/marketingagentcompanies"]
+	path = external_repos/marketingagentcompanies
+	url = https://github.com/ArielSanroj/marketingagentcompanies
+[submodule "external_repos/marketingagent"]
+	path = external_repos/marketingagent
+	url = https://github.com/ArielSanroj/marketingagent
+[submodule "external_repos/callagent"]
+	path = external_repos/callagent
+	url = https://github.com/ArielSanroj/callagent
+[submodule "external_repos/mailicpagent"]
+	path = external_repos/mailicpagent
+	url = https://github.com/ArielSanroj/mailicpagent
+[submodule "external_repos/supervincent"]
+	path = external_repos/supervincent
+	url = https://github.com/ArielSanroj/supervincent
+[submodule "external_repos/linkedinposting"]
+	path = external_repos/linkedinposting
+	url = https://github.com/ArielSanroj/linkedinposting
+[submodule "external_repos/clioalphamodel"]
+	path = external_repos/clioalphamodel
+	url = https://github.com/ArielSanroj/clioalphamodel

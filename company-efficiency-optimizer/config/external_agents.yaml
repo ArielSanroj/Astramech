@@ -1,0 +1,45 @@
+# External agents to be wired via git submodules and adapters
+# local_repo_path is relative to repo root
+
+agents:
+  - name: finance_tax
+    domain: Finanzas/Impuestos
+    repo: https://github.com/ArielSanroj/supervincent
+    local_repo_path: external_repos/supervincent
+    adapter: external_agents.adapters.finance_tax.FinanceTaxAdapter
+
+  - name: marketing_tiktok_ads
+    domain: Marketing - TikTok Ads
+    repo: https://github.com/ArielSanroj/marketingagentcompanies
+    local_repo_path: external_repos/marketingagentcompanies
+    adapter: external_agents.adapters.marketing_tiktok.MarketingTikTokAdapter
+
+  - name: marketing_google_ads
+    domain: Marketing - Google Ads
+    repo: https://github.com/ArielSanroj/marketingagent
+    local_repo_path: external_repos/marketingagent
+    adapter: external_agents.adapters.marketing_google_ads.MarketingGoogleAdsAdapter
+
+  - name: outbound_calls
+    domain: Ventas - Outbound
+    repo: https://github.com/ArielSanroj/callagent
+    local_repo_path: external_repos/callagent
+    adapter: external_agents.adapters.outbound_calls.OutboundCallsAdapter
+
+  - name: linkedin_commenter
+    domain: Marketing - LinkedIn
+    repo: https://github.com/ArielSanroj/linkedinposting
+    local_repo_path: external_repos/linkedinposting
+    adapter: external_agents.adapters.linkedin_commenter.LinkedInCommenterAdapter
+
+  - name: crm_email
+    domain: Ventas/CRM
+    repo: https://github.com/ArielSanroj/mailicpagent
+    local_repo_path: external_repos/mailicpagent
+    adapter: external_agents.adapters.crm_email.CRMEmailAdapter
+
+  - name: hr_clioalpha
+    domain: Recursos Humanos
+    repo: https://github.com/ArielSanroj/clioalphamodel
+    local_repo_path: external_repos/clioalphamodel
+    adapter: external_agents.adapters.hr_clio.HRAgentClioAdapter
