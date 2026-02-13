@@ -28,12 +28,12 @@ vercel env add NGROK_URL production <<< "https://astramech.ngrok.app"
 vercel env add NGROK_AUTHTOKEN production <<< "2mtkS18m9XOwl8cFgBxpWHyXgio_4wLygqUmXu7Fqz43DhN2w"
 
 # Ollama Configuration (from .env)
-vercel env add OLLAMA_API_KEY production <<< "***REMOVED***"
+vercel env add OLLAMA_API_KEY production <<< "c6f1e109560b4b098ff80b99c5942d42.DdN4aonYSge8plew0dvp3XO_"
 vercel env add OLLAMA_BASE_URL production <<< "http://localhost:11434"
 vercel env add OLLAMA_MODEL production <<< "llama3.1:8b"
 
 # Pinecone Configuration
-vercel env add PINECONE_API_KEY production <<< "***REMOVED***"
+vercel env add PINECONE_API_KEY production <<< "pcsk_5F4Kxb_EpxvT1nERpkNoUPo5uNk7UiARTGpB6GRJ5TKSpApKpoYRguLGb89WHvnRupSVh"
 
 # Project Configuration
 vercel env add PROJECT_NAME production <<< "AstraMech"
