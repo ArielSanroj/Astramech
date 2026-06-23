@@ -12,7 +12,7 @@ from .ports import (
     FuenteDeDatos, RegistroCanonico, DecisionLedger,
     ProveedorDeTiempo, ProveedorDeIdentidad,
 )
-from ..domain import rules
+from ..domain import rules, debate
 from ..domain.entities import (
     Producto, Snapshot, Diagnostico, DecisionRecomendada, Afirmacion, RegistroCanonicoEntry,
 )
@@ -54,6 +54,10 @@ class DiagnosticarProducto:
             producto.expected_business_outcome.get("metrica_norte") or "kpi_principal"
         )
 
+        # §19.2 — DIAGNOSE como debate (hipótesis rivales).
+        hipotesis = debate.debatir(senales, snapshot.datos_faltantes)
+        contexto["debate_opciones"] = debate.opciones_consideradas(hipotesis)
+
         afirmaciones: list[Afirmacion] = list(snapshot.afirmaciones)
         afirmaciones.append(Afirmacion(
             f"Estado operativo {estado_op.value} (confianza {conf_op}).",
@@ -63,6 +67,7 @@ class DiagnosticarProducto:
             EtiquetaAfirmacion.INFERENCIA))
         for a in anomalias:
             afirmaciones.append(Afirmacion(f"Anomalía: {a}.", EtiquetaAfirmacion.HECHO))
+        afirmaciones.extend(debate.afirmaciones_del_debate(hipotesis))
         if snapshot.datos_faltantes:
             afirmaciones.append(Afirmacion(
                 f"Datos faltantes: {', '.join(snapshot.datos_faltantes)}.",
@@ -131,8 +136,8 @@ class DecidirProximaAccion:
             razonamiento=(f"operativo={diag.estado_operativo.value}, "
                           f"comercial={diag.estado_comercial.value}. "
                           f"{len(aprendizajes)} aprendizaje(s) previo(s) consultado(s) (R8)."),
-            opciones_consideradas=[{"opcion": accion, "elegida": True},
-                                   {"opcion": "HOLD", "elegida": False}],
+            opciones_consideradas=contexto.get("debate_opciones") or [
+                {"opcion": accion, "elegida": True}, {"opcion": "HOLD", "elegida": False}],
             datos_usados={"kpis": diag.kpis, "anomalias": diag.anomalias},
             afirmaciones=diag.afirmaciones,
             estado_aprobacion=EstadoAprobacion.PENDIENTE,
