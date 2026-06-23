@@ -1,5 +1,7 @@
 # Astramech
 
+> Para tareas de negocio, sigue `SUPERLOOP.md`.
+
 ## Descripción
 Astramech es un orquestador multi-agente especializado que automatiza la cadena de valor empresarial completa. Integra agentes especializados en marketing (Google Ads, TikTok), ventas (LinkedIn, cold calling), CRM, finanzas y recursos humanos, coordinándolos a través de una arquitectura escalable con CrewAI, FastAPI y RabbitMQ.
 
