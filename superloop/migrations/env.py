@@ -2,6 +2,13 @@
 from __future__ import annotations
 
 import os
+import sys
+
+# Asegura que el root del repo esté en sys.path, independiente del CWD de invocación
+# (env.py vive en superloop/migrations/ → el root está 3 niveles arriba).
+_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
 
 from alembic import context
 

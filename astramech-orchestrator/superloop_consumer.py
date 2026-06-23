@@ -46,9 +46,11 @@ class SuperloopConsumer:
         from shared.events import Topics
         conn = pika.BlockingConnection(pika.URLParameters(self.url))
         ch = conn.channel()
-        queue = "superloop.decision.approved"
+        # El default exchange ("") enruta por nombre de cola = routing key. NO se puede
+        # hacer queue_bind al default exchange (403). Por eso la cola se llama igual que
+        # el routing key y el publisher publica con routing_key=Topics.decision_approved.
+        queue = Topics.decision_approved
         ch.queue_declare(queue=queue, durable=True)
-        ch.queue_bind(exchange="", queue=queue, routing_key=Topics.decision_approved)
         ch.basic_consume(queue=queue, on_message_callback=self._on_message)
         logger.info("🚀 SuperloopConsumer escuchando %s", Topics.decision_approved)
         ch.start_consuming()
