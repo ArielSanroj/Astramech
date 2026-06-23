@@ -108,9 +108,15 @@ def orchestrate_done(reg: dict[str, Any]) -> tuple[bool, list[str]]:
 
 def verify_done(reg: dict[str, Any]) -> tuple[bool, list[str]]:
     """§16 VERIFY done: gate evaluado contra datos, baseline + ventana, hipótesis
-    sostuvo/falló/incierta."""
+    sostuvo/falló/incierta.
+
+    El estado de la hipótesis se registra de forma explícita (tri-estado): un
+    `estado_hipotesis` en {sostuvo, fallo, incierta}, o un `hipotesis_sostuvo` booleano.
+    'incierta' es un estado VÁLIDO (no es lo mismo que no haberlo registrado).
+    """
     faltan: list[str] = []
-    if reg.get("hipotesis_sostuvo") is None:
+    estado = reg.get("estado_hipotesis")
+    if estado not in ("sostuvo", "fallo", "incierta") and reg.get("hipotesis_sostuvo") is None:
         faltan.append("no se registró si la hipótesis sostuvo/falló/incierta")
     if not reg.get("resultado"):
         faltan.append("falta resultado medido")

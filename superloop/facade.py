@@ -14,8 +14,12 @@ from .adapters.persistence.engine import make_engine, init_schema, make_session_
 from .adapters.persistence.repositories import RegistroCanonicoRepo, DecisionLedgerRepo
 from .adapters.fuentes.efficiency_engine_source import EfficiencyEngineSource
 from .adapters.tiempo import TiempoUTC, IdentidadUUID
+from .adapters.ejecutor import EjecutorGated
+from .adapters.verify_learn import VerificadorReobservacion, AprendizajeLedger
 from .application.state_machine import SuperloopStateMachine, CicloResultado, PhaseNotDone
 from .application.use_cases import ObservarProducto, DiagnosticarProducto, DecidirProximaAccion
+from .application.closing import OrquestarAccionAprobada, VerificarResultado, RegistrarAprendizaje
+from .domain import phase_done
 from .domain.entities import Producto
 
 
@@ -42,6 +46,55 @@ class SuperloopFacade:
             "decide": DecidirProximaAccion(self.registro, self.ledger, self.tiempo, self.identidad),
         }
         self.machine = SuperloopStateMachine(use_cases, detener_en=self.settings.detener_en)
+
+        # Fase 3 — cierre del loop (post-aprobación humana).
+        self.ejecutor = EjecutorGated(self._sf, crew_dispatch=None)
+        self._orquestar = OrquestarAccionAprobada(self.ejecutor)
+        self._verificar = VerificarResultado(
+            VerificadorReobservacion(self._sf, self.fuente, self.registro))
+        self._aprender = RegistrarAprendizaje(AprendizajeLedger(self._sf))
+
+    def aprobar(self, decision_id: str, aprobador: str) -> None:
+        """Registra una aprobación HUMANA en el Ledger (R1)."""
+        if not aprobador:
+            raise ValueError("aprobador humano requerido (R1)")
+        self.ledger.actualizar_aprobacion(decision_id, "aprobado", aprobador)
+
+    def resume_aprobados(self) -> list[dict[str, Any]]:
+        """ORCHESTRATE→VERIFY→LEARN sobre decisiones aprobadas (cadencia REPEAT, R8)."""
+        from sqlalchemy import select
+        from .adapters.persistence.models import DecisionLedgerRow
+        with self._sf() as s:
+            rows = s.execute(
+                select(DecisionLedgerRow)
+                .where(DecisionLedgerRow.estado_aprobacion == "aprobado")
+                .where(DecisionLedgerRow.aprendizaje.is_(None))
+            ).scalars().all()
+            decisiones = [self._row_to_dict(r) for r in rows]
+        return [self._cerrar_ciclo(d) for d in decisiones]
+
+    @staticmethod
+    def _row_to_dict(r) -> dict[str, Any]:
+        return {c.name: getattr(r, c.name) for c in r.__table__.columns}
+
+    def _cerrar_ciclo(self, decision: dict[str, Any]) -> dict[str, Any]:
+        ctx: dict[str, Any] = {}
+        orq = self._orquestar(decision, ctx)
+        ok, faltan = phase_done.orchestrate_done({**decision, **orq})
+        if not ok:
+            return {"decision_id": decision.get("decision_id"), "fase": "orchestrate",
+                    "ok": False, "faltan": faltan, "detalle": orq}
+        ver = self._verificar(decision, ctx)
+        ok, faltan = phase_done.verify_done(ver)
+        if not ok:
+            return {"decision_id": decision.get("decision_id"), "fase": "verify",
+                    "ok": False, "faltan": faltan, "detalle": ver}
+        learn = self._aprender(decision, ctx)
+        ok, faltan = phase_done.learn_done(learn)
+        return {"decision_id": decision.get("decision_id"),
+                "fase": "learn" if ok else "learn_incompleto", "ok": ok, "faltan": faltan,
+                "siguiente_movimiento": learn.get("siguiente_movimiento"),
+                "aprendizaje": learn.get("aprendizaje")}
 
     def seed_productos_dominios(self) -> int:
         creados = 0
