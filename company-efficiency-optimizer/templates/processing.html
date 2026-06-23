@@ -192,6 +192,129 @@
                     </div>
                 </div>
             </div>
+
+            {% if guided_flow %}
+            <div class="mt-4 text-start" style="max-width: 640px; margin: 0 auto;">
+                <div class="card p-3">
+                    <h4 class="mb-2">Checklist inicial</h4>
+                    <ul class="mb-0">
+                        {% for item in guided_flow.checklist %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if sales_plan %}
+            <div class="mt-4 text-start" style="max-width: 640px; margin: 0 auto;">
+                <div class="card p-3">
+                    <h4 class="mb-2">Plan de ventas sugerido</h4>
+                    <ul class="mb-0">
+                        {% for action in sales_plan.actions %}
+                        <li>
+                            <strong>{{ action.title }}</strong> — {{ action.description }}
+                            {% if action.expected_impact or action.timeframe %}
+                            <div class="text-muted small">
+                                {% if action.expected_impact %}Impacto: {{ action.expected_impact }}{% endif %}
+                                {% if action.expected_impact and action.timeframe %} · {% endif %}
+                                {% if action.timeframe %}Tiempo: {{ action.timeframe }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if ops_plan %}
+            <div class="mt-4 text-start" style="max-width: 640px; margin: 0 auto;">
+                <div class="card p-3">
+                    <h4 class="mb-2">Plan de operaciones sugerido</h4>
+                    <ul class="mb-0">
+                        {% for action in ops_plan.actions %}
+                        <li>
+                            <strong>{{ action.title }}</strong> — {{ action.description }}
+                            {% if action.expected_impact or action.timeframe %}
+                            <div class="text-muted small">
+                                {% if action.expected_impact %}Impacto: {{ action.expected_impact }}{% endif %}
+                                {% if action.expected_impact and action.timeframe %} · {% endif %}
+                                {% if action.timeframe %}Tiempo: {{ action.timeframe }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if finance_plan %}
+            <div class="mt-4 text-start" style="max-width: 640px; margin: 0 auto;">
+                <div class="card p-3">
+                    <h4 class="mb-2">Plan financiero sugerido</h4>
+                    <ul class="mb-0">
+                        {% for action in finance_plan.actions %}
+                        <li>
+                            <strong>{{ action.title }}</strong> — {{ action.description }}
+                            {% if action.expected_impact or action.timeframe %}
+                            <div class="text-muted small">
+                                {% if action.expected_impact %}Impacto: {{ action.expected_impact }}{% endif %}
+                                {% if action.expected_impact and action.timeframe %} · {% endif %}
+                                {% if action.timeframe %}Tiempo: {{ action.timeframe }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if marketing_plan %}
+            <div class="mt-4 text-start" style="max-width: 640px; margin: 0 auto;">
+                <div class="card p-3">
+                    <h4 class="mb-2">Plan de marketing sugerido</h4>
+                    <ul class="mb-0">
+                        {% for action in marketing_plan.actions %}
+                        <li>
+                            <strong>{{ action.title }}</strong> — {{ action.description }}
+                            {% if action.expected_impact or action.timeframe %}
+                            <div class="text-muted small">
+                                {% if action.expected_impact %}Impacto: {{ action.expected_impact }}{% endif %}
+                                {% if action.expected_impact and action.timeframe %} · {% endif %}
+                                {% if action.timeframe %}Tiempo: {{ action.timeframe }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if hr_plan %}
+            <div class="mt-4 text-start" style="max-width: 640px; margin: 0 auto;">
+                <div class="card p-3">
+                    <h4 class="mb-2">Plan de RRHH sugerido</h4>
+                    <ul class="mb-0">
+                        {% for action in hr_plan.actions %}
+                        <li>
+                            <strong>{{ action.title }}</strong> — {{ action.description }}
+                            {% if action.expected_impact or action.timeframe %}
+                            <div class="text-muted small">
+                                {% if action.expected_impact %}Impacto: {{ action.expected_impact }}{% endif %}
+                                {% if action.expected_impact and action.timeframe %} · {% endif %}
+                                {% if action.timeframe %}Tiempo: {{ action.timeframe }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -279,4 +402,3 @@
         setTimeout(checkResults, 3000);
     </script>
 {% endblock %}
-

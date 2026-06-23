@@ -66,3 +66,10 @@ echo "2. Start services: docker compose up -d"
 echo "3. Check logs: docker compose logs -f"
 echo "4. Run verification: python scripts/verify_finance_integration.py"
 
+
+
+
+
+
+
+

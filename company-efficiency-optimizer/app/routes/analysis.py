@@ -9,43 +9,14 @@ import os
 import pandas as pd
 import logging
 from app.services.analysis_service import AnalysisService
-from app.utils.validators import validate_questionnaire_data, validate_file_upload
-from app.utils.errors import ValidationError, FileProcessingError
+from app.utils.validators import validate_file_upload
+from app.utils.errors import ValidationError
 from data_ingest import EnhancedDataIngestion
 
 logger = logging.getLogger(__name__)
 
 analysis_bp = Blueprint('analysis', __name__)
 data_ingestion = EnhancedDataIngestion()
-
-@analysis_bp.route('/process_questionnaire', methods=['POST'])
-def process_questionnaire():
-    """Process questionnaire form submission"""
-    try:
-        company_data = {
-            'company_name': request.form.get('company_name'),
-            'industry': request.form.get('industry'),
-            'company_size': request.form.get('company_size'),
-            'revenue_range': request.form.get('revenue_range'),  # Optional (for backward compatibility)
-            'employee_count': request.form.get('employee_count'),
-            'current_challenges': request.form.get('current_challenges', ''),  # Optional
-            'goals': request.form.get('goals', ''),  # Optional
-            'analysis_focus': request.form.getlist('analysis_focus')
-        }
-        
-        validated_data = validate_questionnaire_data(company_data)
-        session['questionnaire_data'] = validated_data
-        
-        flash('Questionnaire submitted successfully! Please upload your financial documents.', 'success')
-        return redirect(url_for('main.upload'))
-        
-    except ValidationError as e:
-        flash(f'Validation error: {str(e)}', 'error')
-        return redirect(url_for('main.questionnaire'))
-    except Exception as e:
-        logger.error(f"Error processing questionnaire: {str(e)}")
-        flash(f'Error processing questionnaire: {str(e)}', 'error')
-        return redirect(url_for('main.questionnaire'))
 
 @analysis_bp.route('/process_upload', methods=['POST'])
 def process_upload():
@@ -62,8 +33,8 @@ def process_upload():
 
         questionnaire_data = session.get('questionnaire_data', {})
         if not questionnaire_data:
-            flash('No questionnaire data found. Please complete the questionnaire first.', 'error')
-            return redirect(url_for('main.questionnaire'))
+            flash('No se encontraron datos. Completa el inicio rápido primero.', 'error')
+            return redirect(url_for('main.index'))
         
         # Process files
         processed_data = {}

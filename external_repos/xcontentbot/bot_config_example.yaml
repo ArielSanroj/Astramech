@@ -1,0 +1,166 @@
+# xcontentbot Configuration Example
+# Copy this file to bot_config.yaml and customize for your needs
+
+app:
+  # Core application settings
+  queries:
+    - "burnout"
+    - "employee well-being" 
+    - "productivity"
+    - "work-life balance"
+    - "mental health at work"
+  
+  limit: 10                    # Number of posts to fetch per query
+  max_posts_to_process: 3      # Maximum posts to process per run
+  auto_post: false             # Set to true to enable automatic posting
+  
+  # MCP server settings
+  mcp_server_url: "http://127.0.0.1:8000/mcp"
+  mcp_timeout: 60.0
+  
+  # Concurrency settings
+  concurrency:
+    max_concurrent_posts: 2
+  
+  # Scheduler settings
+  scheduler:
+    enable: false              # Enable scheduled runs
+    run_on_startup: false      # Run once on startup
+    timezone: "Europe/Madrid"  # Timezone for scheduling
+    cron: "0 8 * * *"          # Cron expression (8 AM daily)
+  
+  # State management
+  state:
+    state_file: "bot_state.json"
+
+# LLM Provider Configuration
+llm:
+  # Default provider to use
+  default_provider: "openai"
+  
+  # Enable comment refinement
+  refine_enabled: false
+  
+  # System prompt for comment generation
+  system_prompt: "Generate a warm, professional comment under 280 characters. Avoid hard-sell language and focus on providing value."
+  
+  # Provider configurations
+  providers:
+    openai:
+      name: "openai"
+      model: "gpt-4o-mini"
+      api_key_env: "OPENAI_API_KEY"
+      temperature: 0.4
+      max_tokens: 120
+      timeout: 30.0
+      max_retries: 3
+      base_url: null  # Use default OpenAI API URL
+      extra_params: {}
+    
+    anthropic:
+      name: "anthropic"
+      model: "claude-3-haiku-20240307"
+      api_key_env: "ANTHROPIC_API_KEY"
+      temperature: 0.4
+      max_tokens: 120
+      timeout: 30.0
+      max_retries: 3
+      base_url: null
+      extra_params: {}
+    
+    mock:
+      name: "mock"
+      model: "test-model"
+      api_key_env: "MOCK_API_KEY"
+      temperature: 0.4
+      max_tokens: 100
+      timeout: 5.0
+      max_retries: 1
+      base_url: null
+      extra_params: {}
+
+# Retry Configuration
+retry:
+  max_retries: 3              # Maximum number of retries
+  base_delay: 1.0             # Base delay between retries (seconds)
+  max_delay: 60.0             # Maximum delay between retries (seconds)
+  exponential_base: 2.0       # Exponential backoff multiplier
+  jitter: 0.1                 # Jitter factor to prevent thundering herd
+
+# Circuit Breaker Configuration
+circuit_breaker:
+  failure_threshold: 5        # Failures before opening circuit
+  recovery_timeout: 60.0      # Seconds to wait before half-open
+  success_threshold: 3        # Successes needed to close circuit
+  timeout: 30.0               # Timeout for individual calls
+
+# Rate Limiting Configuration
+rate_limit:
+  posts_per_hour: 6           # Maximum posts per hour
+  posts_per_day: 50           # Maximum posts per day
+  api_calls_per_minute: 60    # Maximum API calls per minute
+  burst_limit: 10             # Burst limit for rapid requests
+
+# Playwright Configuration
+playwright:
+  headless: true              # Run browser in headless mode
+  timeout: 30.0               # Default timeout for operations
+  slow_mo: 0                  # Slow down operations (milliseconds)
+  viewport_width: 1280        # Browser viewport width
+  viewport_height: 720        # Browser viewport height
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  block_resources:            # Resources to block for faster loading
+    - "image"
+    - "stylesheet" 
+    - "font"
+    - "media"
+
+# Logging Configuration
+logging:
+  level: "INFO"               # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  format: "structured"        # Log format (structured, simple)
+  file_path: "logs/xcontentbot.log"
+  max_file_size: 10485760     # Maximum log file size (10MB)
+  backup_count: 5             # Number of backup log files
+  console_output: true        # Output logs to console
+
+# Observability Configuration
+observability:
+  enable_metrics: true        # Enable metrics collection
+  enable_health_checks: true  # Enable health check endpoints
+  metrics_export_interval: 300  # Metrics export interval (seconds)
+  health_check_interval: 60   # Health check interval (seconds)
+  export_path: "metrics"      # Path for metrics exports
+
+# Monitoring Configuration
+monitoring:
+  enable: true                # Enable monitoring service
+  port: 8080                  # Monitoring service port
+  host: "0.0.0.0"            # Monitoring service host
+  dashboard_enabled: true     # Enable web dashboard
+  health_endpoint: true       # Enable health endpoint
+  metrics_endpoint: true      # Enable metrics endpoint
+  logs_endpoint: true         # Enable logs endpoint
+  diagnostics_endpoint: true  # Enable diagnostics endpoint
+
+# Security Configuration
+security:
+  # Rate limiting for login attempts
+  login_attempts_per_hour: 5
+  login_attempts_per_day: 20
+  
+  # Session management
+  session_timeout: 3600       # Session timeout (seconds)
+  max_concurrent_sessions: 3  # Maximum concurrent sessions
+  
+  # API security
+  api_rate_limit: 100         # API requests per minute
+  api_burst_limit: 20         # API burst limit
+
+# Development Configuration
+development:
+  debug_mode: false           # Enable debug mode
+  mock_llm: false             # Use mock LLM responses
+  mock_playwright: false      # Use mock Playwright operations
+  verbose_logging: false      # Enable verbose logging
+  test_mode: false            # Enable test mode

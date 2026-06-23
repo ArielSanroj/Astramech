@@ -13,6 +13,8 @@ from crewai import Agent, Crew, Task, Process
 from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama
 
+from event_consumer import EventConsumer
+
 # Add shared directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'shared'))
 from events import Topics
@@ -239,73 +241,6 @@ class AstramechSupervisor:
             logger.error(f"❌ Failed to publish workflow result: {e}")
 
 
-class EventConsumer:
-    """RabbitMQ event consumer"""
-    
-    def __init__(self, supervisor: AstramechSupervisor):
-        self.supervisor = supervisor
-        self.connection = None
-        self.channel = None
-    
-    def connect(self):
-        """Connect to RabbitMQ"""
-        try:
-            self.connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
-            self.channel = self.connection.channel()
-            
-            # Declare queues
-            self.channel.queue_declare(queue=Topics.buyer_signal_detected, durable=True)
-            self.channel.queue_declare(queue=Topics.burnout_risk, durable=True)
-            
-            logger.info("✅ Connected to RabbitMQ")
-        except Exception as e:
-            logger.error(f"❌ Failed to connect to RabbitMQ: {e}")
-            raise
-    
-    def start_consuming(self):
-        """Start consuming events"""
-        # Set up consumer for buyer_signal.detected
-        self.channel.basic_consume(
-            queue=Topics.buyer_signal_detected,
-            on_message_callback=self._on_buyer_signal,
-            auto_ack=True
-        )
-        
-        # Set up consumer for burnout.risk.detected
-        self.channel.basic_consume(
-            queue=Topics.burnout_risk,
-            on_message_callback=self._on_burnout_risk,
-            auto_ack=True
-        )
-        
-        logger.info("🎧 Starting to consume events...")
-        logger.info(f"   Listening to: {Topics.buyer_signal_detected}")
-        logger.info(f"   Listening to: {Topics.burnout_risk}")
-        
-        try:
-            self.channel.start_consuming()
-        except KeyboardInterrupt:
-            logger.info("🛑 Stopping consumer...")
-            self.channel.stop_consuming()
-            self.connection.close()
-    
-    def _on_buyer_signal(self, ch, method, properties, body):
-        """Handle buyer_signal.detected event"""
-        try:
-            data = json.loads(body)
-            self.supervisor.handle_buyer_signal(data)
-        except Exception as e:
-            logger.error(f"❌ Error handling buyer signal: {e}")
-    
-    def _on_burnout_risk(self, ch, method, properties, body):
-        """Handle burnout.risk.detected event"""
-        try:
-            data = json.loads(body)
-            self.supervisor.handle_burnout_risk(data)
-        except Exception as e:
-            logger.error(f"❌ Error handling burnout risk: {e}")
-
-
 def main():
     """Main entry point"""
     logger.info("🚀 Astramech Orchestrator starting...")
@@ -314,7 +249,7 @@ def main():
     supervisor = AstramechSupervisor()
     
     # Initialize and start event consumer
-    consumer = EventConsumer(supervisor)
+    consumer = EventConsumer(supervisor, rabbitmq_url=RABBITMQ_URL, topics=Topics)
     
     # Retry connection logic
     max_retries = 5

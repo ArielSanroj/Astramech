@@ -296,3 +296,10 @@ Una vez que todos los servicios estén corriendo:
 
 **¡Sistema Astramech listo para usar!** 🚀
 
+
+
+
+
+
+
+

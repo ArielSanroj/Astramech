@@ -3,13 +3,9 @@ Main routes for the Company Efficiency Optimizer
 """
 
 from flask import Blueprint, render_template, redirect, url_for, flash, session
-from flask import current_app, send_from_directory, Response, jsonify, request
+from flask import current_app, send_from_directory, Response, jsonify
 # new imports
-from app.services.supervincent_service import SuperVincentService
-from app.services.clio_service import ClioService
 from app.utils.export import export_results_to_csv, export_results_to_json
-# from app.services.analysis_service import AnalysisService
-# from app.utils.validators import validate_questionnaire_data
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,25 +17,25 @@ def index():
     """Homepage"""
     return render_template('index.html')
 
-@main_bp.route('/questionnaire')
-def questionnaire():
-    """Questionnaire form"""
-    return render_template('questionnaire.html')
-
 @main_bp.route('/upload')
 def upload():
     """File upload page"""
     if not session.get('questionnaire_data'):
-        flash('Please complete the questionnaire first.', 'error')
-        return redirect(url_for('main.questionnaire'))
+        flash('Completa el inicio rápido primero.', 'error')
+        return redirect(url_for('main.index'))
     return render_template('upload.html')
+
+@main_bp.route('/guided')
+def guided():
+    """Guided onboarding flow when data is not available."""
+    return render_template('guided.html')
 
 @main_bp.route('/processing')
 def processing():
     """Processing/analysis in progress page"""
     if not session.get('questionnaire_data'):
-        flash('Please complete the questionnaire first.', 'error')
-        return redirect(url_for('main.questionnaire'))
+        flash('Completa el inicio rápido primero.', 'error')
+        return redirect(url_for('main.index'))
     
     # If files uploaded but analysis not started, trigger it
     if session.get('files_uploaded') and not session.get('analysis_started'):
@@ -58,7 +54,21 @@ def processing():
             logger.error(f"Error during analysis: {str(e)}")
             session['analysis_error'] = str(e)
     
-    return render_template('processing.html')
+    guided_flow = session.get('guided_flow')
+    sales_plan = session.get('sales_plan')
+    ops_plan = session.get('ops_plan')
+    finance_plan = session.get('finance_plan')
+    marketing_plan = session.get('marketing_plan')
+    hr_plan = session.get('hr_plan')
+    return render_template(
+        'processing.html',
+        guided_flow=guided_flow,
+        sales_plan=sales_plan,
+        ops_plan=ops_plan,
+        finance_plan=finance_plan,
+        marketing_plan=marketing_plan,
+        hr_plan=hr_plan,
+    )
 
 @main_bp.route('/results')
 def results():
@@ -71,7 +81,22 @@ def results():
     # Mark analysis as viewed
     session['analysis_viewed'] = True
     
-    return render_template('results.html', results=results)
+    guided_flow = session.get('guided_flow')
+    sales_plan = session.get('sales_plan')
+    ops_plan = session.get('ops_plan')
+    finance_plan = session.get('finance_plan')
+    marketing_plan = session.get('marketing_plan')
+    hr_plan = session.get('hr_plan')
+    return render_template(
+        'results.html',
+        results=results,
+        guided_flow=guided_flow,
+        sales_plan=sales_plan,
+        ops_plan=ops_plan,
+        finance_plan=finance_plan,
+        marketing_plan=marketing_plan,
+        hr_plan=hr_plan,
+    )
 
 @main_bp.route('/clear_session', methods=['POST'])
 def clear_session():
@@ -117,43 +142,3 @@ def export_json():
         mimetype='application/json',
         headers={'Content-Disposition': f'attachment; filename=astramech-analysis-{results.get("company_name", "report")}.json'}
     )
-
-
-@main_bp.route('/agents/supervincent')
-def supervincent_agent():
-    """SuperVincent financial agent landing."""
-    return render_template('agents/supervincent.html')
-
-
-@main_bp.route('/agents/supervincent/status')
-def supervincent_status():
-    service = SuperVincentService()
-    return jsonify(service.get_status())
-
-
-@main_bp.route('/agents/supervincent/run', methods=['POST'])
-def supervincent_run():
-    service = SuperVincentService()
-    result = service.run_analysis()
-    return jsonify(result)
-
-
-@main_bp.route('/agents/clioalpha')
-def clio_agent():
-    return render_template('agents/clioalpha.html')
-
-
-@main_bp.route('/agents/clioalpha/status')
-def clio_status():
-    service = ClioService()
-    overview = service.get_team_overview()
-    risk = service.get_risk_analysis()
-    return jsonify({"overview": overview, "risk": risk})
-
-
-@main_bp.route('/agents/clioalpha/analyze', methods=['POST'])
-def clio_analyze():
-    service = ClioService()
-    payload = request.get_json(force=True, silent=True) or {}
-    members = payload.get("members") or {}
-    return jsonify(service.analyze_composition(members))

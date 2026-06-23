@@ -67,3 +67,7 @@ htmlcov/
 ngrok_config.yml
 flask.log
 *.ngrok.yml
+
+# Local runtime/cache artifacts
+.cache/
+data/*.db

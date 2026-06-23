@@ -9,3 +9,5 @@ class Topics:
     buyer_signal_detected: str = "buyer_signal.detected"
     call_completed: str = "call.completed"
     burnout_risk: str = "burnout.risk.detected"
+    x_comment_posted: str = "x.comment.posted"
+    x_engagement_detected: str = "x.engagement.detected"

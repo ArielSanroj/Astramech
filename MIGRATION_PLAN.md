@@ -168,3 +168,10 @@ Si prefieres mantener `external_repos/` (por ejemplo, si son git submodules), po
 
 ¿Cómo procedemos?
 
+
+
+
+
+
+
+

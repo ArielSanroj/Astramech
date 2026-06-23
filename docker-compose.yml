@@ -57,6 +57,7 @@ services:
       LINKEDIN_SERVICE_URL: ${LINKEDIN_SERVICE_URL:-http://linkedin-posting:8001}
       CRM_SERVICE_URL: ${CRM_SERVICE_URL:-http://crm-email:5000}
       CALLS_SERVICE_URL: ${CALLS_SERVICE_URL:-http://cold-calling:8000}
+      X_SERVICE_URL: ${X_SERVICE_URL:-http://marketing-x:8005}
     ports:
       - "8000:8000"
     depends_on:
@@ -92,6 +93,36 @@ services:
       - linkedin-posting
       - crm-email
       - cold-calling
+      - marketing-x
+
+  marketing-x:
+    build:
+      context: agents/marketing_x
+      dockerfile: Dockerfile
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      X_USERNAME: ${X_USERNAME}
+      X_PASSWORD: ${X_PASSWORD}
+      HEADLESS: "true"
+      LOG_LEVEL: INFO
+    ports:
+      - "8005:8005"
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    volumes:
+      - ./agents/marketing_x/browser/storage:/app/browser/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   finance-supervincent:
     build:

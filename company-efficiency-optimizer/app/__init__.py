@@ -57,6 +57,14 @@ def create_app(config_name=None):
     
     # Register error handlers
     register_error_handlers(app)
+
+    # Initialize leads database
+    try:
+        from app.db import init_leads_db
+        with app.app_context():
+            init_leads_db()
+    except Exception as exc:
+        app.logger.error(f"Failed to initialize leads DB: {exc}")
     
     # Register blueprints
     from app.routes.main import main_bp

@@ -156,3 +156,10 @@ async def google_ads_health():
             detail="Google Ads service unavailable"
         )
 
+
+
+
+
+
+
+

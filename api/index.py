@@ -1,11 +1,12 @@
-"""Vercel serverless entrypoint for Astramech Flask app."""
+"""Vercel serverless entrypoint for the core Flask app."""
 
 import os
 import sys
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.join(BASE_DIR, "company-efficiency-optimizer")
+REPO_ROOT = os.path.dirname(BASE_DIR)
+PROJECT_DIR = os.path.join(REPO_ROOT, "company-efficiency-optimizer")
 
 if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)

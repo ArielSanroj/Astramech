@@ -21,6 +21,7 @@ class Config:
     
     # Database Configuration
     DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///efficiency_optimizer.db')
+    LEADS_DB_PATH = os.getenv('LEADS_DB_PATH', 'data/astramech.db')
     
     # File Upload Configuration
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
@@ -78,6 +79,14 @@ class Config:
                 os.makedirs(log_dir, exist_ok=True)
             except Exception as e:
                 issues.append(f"Cannot create log directory: {e}")
+
+        # Check leads DB directory
+        leads_dir = os.path.dirname(Config.LEADS_DB_PATH)
+        if leads_dir and not os.path.exists(leads_dir):
+            try:
+                os.makedirs(leads_dir, exist_ok=True)
+            except Exception as e:
+                issues.append(f"Cannot create leads db directory: {e}")
         
         # Validate Ollama configuration
         if not Config.OLLAMA_BASE_URL.startswith(('http://', 'https://')):

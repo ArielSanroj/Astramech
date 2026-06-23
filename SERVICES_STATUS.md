@@ -80,3 +80,10 @@ Todos están incluidos en `routers/__init__.py`.
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Arquitectura del sistema
 - [MIGRATION_FINANCE_SUPERVINCENT.md](./MIGRATION_FINANCE_SUPERVINCENT.md) - Migración Finance
 
+
+
+
+
+
+
+

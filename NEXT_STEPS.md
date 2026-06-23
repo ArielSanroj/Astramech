@@ -147,3 +147,10 @@ Una vez que el servicio finance esté funcionando:
 4. **Implementar métricas** - Prometheus + Grafana
 5. **Agregar circuit breakers** - Para resiliencia
 
+
+
+
+
+
+
+

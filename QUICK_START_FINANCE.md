@@ -121,3 +121,10 @@ Una vez que el servicio esté funcionando:
 
 4. **Agregar autenticación JWT** al API Gateway
 
+
+
+
+
+
+
+

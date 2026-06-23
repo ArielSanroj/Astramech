@@ -143,3 +143,10 @@ docker-compose exec redis redis-cli
 - Verificar variables de entorno (especialmente URLs)
 - Verificar que los servicios dependientes están saludables
 
+
+
+
+
+
+
+

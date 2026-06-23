@@ -17,8 +17,7 @@
     }
   ],
   "env": {
-    "FLASK_ENV": "production",
-    "NGROK_URL": "https://astramech.ngrok.app"
+    "FLASK_ENV": "production"
   },
   "headers": [
     {
@@ -40,4 +39,3 @@
     }
   ]
 }
-

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block title %}Astramech · Flujo guiado{% endblock %}
+{% block meta_description %}Guía rápida para comenzar sin datos disponibles.{% endblock %}
+{% block content %}
+<style>
+    .guided-shell {
+        min-height: 100vh;
+        padding: 4rem 1.5rem 6rem;
+        background: radial-gradient(circle at 10% 20%, rgba(0, 200, 255, 0.08), transparent 45%),
+                    radial-gradient(circle at 90% 0%, rgba(123, 97, 255, 0.1), transparent 55%),
+                    var(--color-bg);
+    }
+
+    .guided-card {
+        max-width: 860px;
+        margin: 0 auto;
+        background: var(--color-surface);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 2rem 2.5rem;
+    }
+
+    .guided-card h1 {
+        font-size: 32px;
+    }
+
+    .guided-list {
+        margin-top: 1.5rem;
+    }
+
+    .guided-item {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 14px;
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .guided-item h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .guided-form {
+        margin-top: 1.5rem;
+        display: grid;
+        gap: 1rem;
+    }
+
+    .guided-form textarea {
+        width: 100%;
+        min-height: 120px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 0.8rem 1rem;
+        color: var(--color-text-primary);
+    }
+
+    .guided-form input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 0.7rem 1rem;
+        color: var(--color-text-primary);
+    }
+
+    .guided-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .guided-actions .btn-primary-alt {
+        background: var(--color-secondary);
+        color: #081325;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .guided-actions .btn-secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--color-text-primary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+    }
+</style>
+
+<div class="guided-shell">
+    <div class="guided-card">
+        <h1>Flujo guiado sin data</h1>
+        <p>Empezamos con bases mínimas para darte una hoja de ruta clara y útil, incluso sin archivos.</p>
+
+        <div class="guided-list">
+            <div class="guided-item">
+                <h3>1. Objetivos y prioridades</h3>
+                <p>Define el impacto que quieres lograr y el horizonte de tiempo.</p>
+            </div>
+            <div class="guided-item">
+                <h3>2. Métricas iniciales</h3>
+                <p>Seleccionamos KPIs base y benchmarks por industria/tamaño.</p>
+            </div>
+            <div class="guided-item">
+                <h3>3. Checklist de datos</h3>
+                <p>Te damos un listado mínimo de datos para comenzar el análisis completo.</p>
+            </div>
+        </div>
+
+        <form class="guided-form" id="guidedForm">
+            <label>
+                Objetivo principal
+                <textarea name="goal" placeholder="Ej: reducir costos operativos 15% en 90 días" required></textarea>
+            </label>
+            <label>
+                Restricciones o contexto
+                <input name="constraints" placeholder="Ej: equipo limitado, alto churn, etc.">
+            </label>
+            <label>
+                Datos que sí tienes (opcional)
+                <input name="available_data" placeholder="Ej: ventas mensuales, headcount, etc.">
+            </label>
+
+            <div class="guided-actions">
+                <button class="btn-primary-alt" type="submit">Generar checklist</button>
+                <a class="btn-secondary" href="/">Volver al inicio</a>
+            </div>
+        </form>
+        <div class="guided-list hidden" id="guidedChecklist"></div>
+        <div class="guided-list hidden" id="salesPlan"></div>
+        <div class="guided-list hidden" id="opsPlan"></div>
+        <div class="guided-list hidden" id="financePlan"></div>
+        <div class="guided-list hidden" id="marketingPlan"></div>
+        <div class="guided-list hidden" id="hrPlan"></div>
+    </div>
+</div>
+
+<script>
+    const guidedForm = document.getElementById('guidedForm');
+    const guidedChecklist = document.getElementById('guidedChecklist');
+    const salesPlan = document.getElementById('salesPlan');
+    const opsPlan = document.getElementById('opsPlan');
+    const financePlan = document.getElementById('financePlan');
+    const marketingPlan = document.getElementById('marketingPlan');
+    const hrPlan = document.getElementById('hrPlan');
+
+    guidedForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(guidedForm);
+        const response = await fetch('/api/guided', {
+            method: 'POST',
+            body: formData,
+        });
+        const result = await response.json();
+        if (result.checklist) {
+            guidedChecklist.innerHTML = '<h3>Checklist sugerido</h3>' +
+                result.checklist.map((item) => `<p>• ${item}</p>`).join('');
+            guidedChecklist.classList.remove('hidden');
+        }
+        const renderAction = (action) => {
+            const impact = action.expected_impact ? `Impacto: ${action.expected_impact}` : '';
+            const timeframe = action.timeframe ? `Tiempo: ${action.timeframe}` : '';
+            const meta = impact && timeframe ? `${impact} · ${timeframe}` : `${impact}${timeframe}`;
+            const metaLine = meta ? `<span class="text-muted small">${meta}</span>` : '';
+            return `<p><strong>${action.title}</strong> — ${action.description}<br>${metaLine}</p>`;
+        };
+
+        if (result.sales_plan) {
+            salesPlan.innerHTML = '<h3>Plan de ventas sugerido</h3>' +
+                result.sales_plan.actions.map(renderAction).join('');
+            salesPlan.classList.remove('hidden');
+        }
+        if (result.ops_plan) {
+            opsPlan.innerHTML = '<h3>Plan de operaciones sugerido</h3>' +
+                result.ops_plan.actions.map(renderAction).join('');
+            opsPlan.classList.remove('hidden');
+        }
+        if (result.finance_plan) {
+            financePlan.innerHTML = '<h3>Plan financiero sugerido</h3>' +
+                result.finance_plan.actions.map(renderAction).join('');
+            financePlan.classList.remove('hidden');
+        }
+        if (result.marketing_plan) {
+            marketingPlan.innerHTML = '<h3>Plan de marketing sugerido</h3>' +
+                result.marketing_plan.actions.map(renderAction).join('');
+            marketingPlan.classList.remove('hidden');
+        }
+        if (result.hr_plan) {
+            hrPlan.innerHTML = '<h3>Plan de RRHH sugerido</h3>' +
+                result.hr_plan.actions.map(renderAction).join('');
+            hrPlan.classList.remove('hidden');
+        }
+    });
+</script>
+{% endblock %}

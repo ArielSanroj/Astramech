@@ -15,3 +15,11 @@ temp_*.json
 uploads/
 .DS_Store
 company-efficiency-optimizer/venv312/
+company-efficiency-optimizer/.cache/
+company-efficiency-optimizer/.pytest_cache/
+company-efficiency-optimizer/.vercel/
+company-efficiency-optimizer/__pycache__/
+company-efficiency-optimizer/flask_session/
+company-efficiency-optimizer/logs/
+company-efficiency-optimizer/uploads/
+company-efficiency-optimizer/data/*.db

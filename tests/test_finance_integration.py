@@ -91,3 +91,10 @@ async def test_gateway_error_handling():
     # In real scenario, you'd mock the httpx client
     pass  # TODO: Implement with mocked httpx client
 
+
+
+
+
+
+
+

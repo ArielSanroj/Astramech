@@ -6,9 +6,21 @@ This tool analyzes P&L data, calculates KPIs, identifies inefficiencies,
 and recommends specific AI agents to address each issue.
 """
 
-from crewai.tools import BaseTool
 import pandas as pd
 from typing import Dict, List, Any
+
+try:
+    from crewai.tools import BaseTool
+except ImportError:
+    class BaseTool:  # type: ignore[override]
+        name: str = ""
+        description: str = ""
+
+        def __call__(self, *args, **kwargs):
+            return self._run(*args, **kwargs)
+
+        def _run(self, *args, **kwargs):
+            raise NotImplementedError
 
 class EnhancedKPITool(BaseTool):
     name: str = "Enhanced KPI Analysis Tool"
