@@ -23,3 +23,9 @@ company-efficiency-optimizer/flask_session/
 company-efficiency-optimizer/logs/
 company-efficiency-optimizer/uploads/
 company-efficiency-optimizer/data/*.db
+
+# Repo PÚBLICO: ningún .env versionado, ni de desarrollo.
+# Auditoría 2026-08-17.
+.env
+.env.*
+!.env.example
