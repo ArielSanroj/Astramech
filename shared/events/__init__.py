@@ -11,3 +11,12 @@ class Topics:
     burnout_risk: str = "burnout.risk.detected"
     x_comment_posted: str = "x.comment.posted"
     x_engagement_detected: str = "x.engagement.detected"
+    # Superloop — eventos de fase del loop de negocio (ver SUPERLOOP.md §6).
+    decision_observation_recorded: str = "decision.observation.recorded"
+    decision_diagnosed: str = "decision.diagnosed"
+    decision_proposed: str = "decision.proposed"
+    decision_approved: str = "decision.approved"
+    decision_rejected: str = "decision.rejected"
+    decision_executed: str = "decision.executed"
+    decision_verified: str = "decision.verified"
+    decision_learned: str = "decision.learned"

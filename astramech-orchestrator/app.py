@@ -250,7 +250,18 @@ def main():
     
     # Initialize and start event consumer
     consumer = EventConsumer(supervisor, rabbitmq_url=RABBITMQ_URL, topics=Topics)
-    
+
+    # Superloop consumer (additive, opt-in via SUPERLOOP_ENABLED): cierra el loop de
+    # negocio cuando un humano aprueba una decisión (ver SUPERLOOP.md §6.4→§6.5).
+    if os.getenv("SUPERLOOP_ENABLED", "").lower() in ("1", "true", "yes"):
+        try:
+            import threading
+            from superloop_consumer import SuperloopConsumer
+            threading.Thread(target=SuperloopConsumer().start, daemon=True).start()
+            logger.info("🔁 SuperloopConsumer iniciado (SUPERLOOP_ENABLED)")
+        except Exception as exc:
+            logger.warning("SuperloopConsumer no iniciado: %s", exc)
+
     # Retry connection logic
     max_retries = 5
     retry_delay = 5

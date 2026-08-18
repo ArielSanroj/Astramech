@@ -1,0 +1,5 @@
+# Superloop — dependencias (ver SUPERLOOP.md).
+SQLAlchemy>=2.0
+alembic>=1.13
+psycopg2-binary>=2.9   # driver síncrono para Postgres en prod (no asyncpg)
+pika>=1.3              # spine RabbitMQ (orchestrator)

@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "TaskCreated": [
+      { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/task_created.py", "timeout": 15 } ] }
+    ],
+    "TaskCompleted": [
+      { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/task_completed.py", "timeout": 15 } ] }
+    ],
+    "TeammateIdle": [
+      { "hooks": [ { "type": "command", "command": "python3 .claude/hooks/teammate_idle.py", "timeout": 15 } ] }
+    ]
+  }
+}
